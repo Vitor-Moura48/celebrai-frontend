@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin } from "lucide-react";
 
 interface ProdutoCardProps {
@@ -17,9 +18,9 @@ export default function ProdutoCard({
   location = "Recife, PE",
 }: ProdutoCardProps) {
   return (
-    <div
-      key={id}
-      className="bg-white shadow-md rounded-lg overflow-hidden hover:scale-[1.02] transition-transform"
+    <Link
+      href={`/produto/${id}`}
+      className="bg-white shadow-md rounded-lg overflow-hidden hover:scale-[1.02] transition-transform block"
     >
       <Image
         src={image}
@@ -37,6 +38,6 @@ export default function ProdutoCard({
           <MapPin size={14} className="mr-1" /> {location}
         </p>
       </div>
-    </div>
+    </Link>
   );
 }
