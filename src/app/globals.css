@@ -4,6 +4,20 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Esconder scrollbar mas manter funcionalidade */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Garantir scroll suave */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
 
 ::-webkit-scrollbar {
   width: 10px;              
