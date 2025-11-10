@@ -1,7 +1,7 @@
 import { ShoppingCart, MessageCircle, MapPin, Clock, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import HorariosPopup from "../Vendedor/Horarios";
+import HorariosPopup from "../HorariosPopup/index";
 import ChatVendedor from "../Vendedor/Chat";
 
 

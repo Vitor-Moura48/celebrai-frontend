@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
-import { CATEGORIAS_FESTAS, API_CATEGORY_ICONS, type Categoria } from "@/lib/categorias";
+import { CATEGORIAS_FESTAS, API_CATEGORY_ICONS, type Categoria } from "@/lib/Constants/categorias";
 
 interface CategoriasSliderProps {
   categorias?: string[];

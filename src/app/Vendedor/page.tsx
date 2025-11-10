@@ -2,7 +2,7 @@ import Image from "next/image";
 import { MapPin, CheckCircle, MessageCircle } from "lucide-react";
 import ProdutoCard from "@/componentes/Card_Produto/ProdutoCard";
 import ChatVendedor from "@/componentes/Vendedor/Chat";
-import HorariosPopup from "@/componentes/Vendedor/Horarios";
+import HorariosPopup from "@/componentes/HorariosPopup/index";
 
 {/*IMPLEMENTAR METADATA DINAMICA DO VENDEDOR POR ID*/}
 
