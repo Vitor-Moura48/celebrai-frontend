@@ -1,32 +1,37 @@
 "use client"
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { CadastroDropdown } from './componentes/dropDown'
 
 export function Header(){
     return(
-        <header  className="fixed top-0 left-0 w-full z-50 bg-[#2a0047]/95 backdrop-blur-sm text-white flex justify-between items-center px-8 py-3 shadow-md">
-            <Link href="/" className="flex items-center space-x-2">
-                <Image
-                    src="/Vector.svg"
-                    alt="Logo Celebrai"
-                    width={20}
-                    height={20}
-                />
-                <span className="font-semibold text-lg">Celebraí</span>
-            </Link>
-
-            <nav className="flex items-center space-x-4">
-                <Link href="#contato" className="text-sm hover:underline">
-                Contato
+        <header className="fixed top-0 left-0 w-full z-50 bg-[#2a0047]/95 backdrop-blur-sm text-white shadow-md">
+            <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+                {/* Logo */}
+                <Link href="/" className="flex items-center space-x-2">
+                    <Image
+                        src="/Vector.svg"
+                        alt="Logo Celebrai"
+                        width={24}
+                        height={24}
+                    />
+                    <span className="font-bold text-xl">Celebraí</span>
                 </Link>
 
-                <Link
-                href="/Login"
-                className="bg-[#ff007f] text-white text-sm px-4 py-2 rounded-md hover:opacity-90 transition"
-                >
-                Cadastre-se
-                </Link>
-            </nav>
+                {/* Navigation */}
+                <nav className="flex items-center space-x-6">
+                    <Link 
+                        href="#contato" 
+                        className="text-sm font-medium hover:text-gray-300 transition"
+                    >
+                        Contato
+                    </Link>
+
+                    <CadastroDropdown />
+
+                </nav>
+            </div>
         </header>
     )
 }

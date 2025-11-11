@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Search } from "lucide-react";
 import ProdutoCard from "@/componentes/Card_Produto/ProdutoCard";
-import BannerCarousel from "@/componentes/Home/Banner";
+import BannerCarousel from "@/componentes/Home/Banner"
 import CategoriasSlider from "@/componentes/Home/Categorias";
 
 export const metadata: Metadata = {
