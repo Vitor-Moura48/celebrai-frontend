@@ -22,10 +22,10 @@ export function Header(){
                 {/* Navigation */}
                 <nav className="flex items-center space-x-6">
                     <Link 
-                        href="#contato" 
+                        href="Login" 
                         className="text-sm font-medium hover:text-gray-300 transition"
                     >
-                        Contato
+                        Entrar
                     </Link>
 
                     <CadastroDropdown />
