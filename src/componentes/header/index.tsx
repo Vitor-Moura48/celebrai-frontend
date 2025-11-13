@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { CadastroDropdown } from './componentes/dropDown'
+import { CarrinhoIcone } from '@/componentes/header/componentes/carrinhoIcone'
 
 export function Header(){
     return(
@@ -30,6 +31,8 @@ export function Header(){
 
                     <CadastroDropdown />
 
+                    {/* Ícone do Carrinho - Só aparece quando tem itens */}
+                    <CarrinhoIcone />
                 </nav>
             </div>
         </header>

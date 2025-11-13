@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import "./globals.css";
 import { Header } from "../componentes/header"
 import { Footer } from "../componentes/footer"
+import { CarrinhoProvider } from "@/Context/carrinhoContext";
 
 export default function RootLayout({
   children,
@@ -24,11 +25,11 @@ export default function RootLayout({
         className={`antialiased`}
       >
 
-        <Header/>
-        
-        {children}
-
-         {!isLoginPage && <Footer />}
+        <CarrinhoProvider>
+          <Header />
+          {children}
+          {!isLoginPage && <Footer />}
+        </CarrinhoProvider>
 
       </body>
     </html>

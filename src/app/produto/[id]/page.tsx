@@ -51,7 +51,10 @@ export default async function ProdutoPage({ params }: { params: Promise<{ id: st
           {/* Lado Direito: Preço e Ações */}
           <ProdutoAcoes 
             price={produto.price * 5} 
-            vendedor={vendedor} 
+            vendedor={vendedor}
+            produtoId={id}
+            produtoNome={produto.title}
+            produtoImagem={produto.image}
           />
         </div>
       </section>

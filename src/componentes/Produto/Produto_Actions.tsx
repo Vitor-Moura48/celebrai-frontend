@@ -1,16 +1,55 @@
+"use client"
+
 import { ShoppingCart, MessageCircle, MapPin, Clock, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import HorariosPopup from "../HorariosPopup/index";
 import ChatVendedor from "../Vendedor/Chat";
-
+import { useCarrinho } from "@/Context/carrinhoContext";
+import { useState } from "react";
 
 interface ProdutoAcoesProps {
   price: number;
-  vendedor: { nome: string; location: string; avatar: string; memberSince?: string; id?: string };
+  vendedor: { 
+    nome: string; 
+    location: string; 
+    avatar: string; 
+    memberSince?: string; 
+    id?: string 
+  };
+  // Novos props necessários para o carrinho
+  produtoId: string;
+  produtoNome: string;
+  produtoImagem: string;
 }
 
-export default function ProdutoAcoes({ price, vendedor }: ProdutoAcoesProps) {
+export default function ProdutoAcoes({ 
+  price, 
+  vendedor,
+  produtoId,
+  produtoNome,
+  produtoImagem
+}: ProdutoAcoesProps) {
+  const { adicionarAoCarrinho } = useCarrinho();
+  const [adicionado, setAdicionado] = useState(false);
+
+  const handleAdicionarAoCarrinho = () => {
+    adicionarAoCarrinho({
+      id: produtoId,
+      nome: produtoNome,
+      preco: price,
+      imagem: produtoImagem,
+      vendedor: {
+        nome: vendedor.nome,
+        location: vendedor.location,
+      }
+    });
+
+    // Feedback visual
+    setAdicionado(true);
+    setTimeout(() => setAdicionado(false), 2000);
+  };
+
   return (
     <div className="flex flex-col gap-4 w-full md:w-[480px]">
       {/* Card de Preço e Botões */}
@@ -20,9 +59,17 @@ export default function ProdutoAcoes({ price, vendedor }: ProdutoAcoesProps) {
           <span className="text-lg font-normal text-gray-600"> por conjunto</span>
         </div>
 
-        <button className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+        {/* Botão Solicitar Compra - Atualizado */}
+        <button 
+          onClick={handleAdicionarAoCarrinho}
+          className={`w-full font-semibold py-4 px-6 rounded-lg flex items-center justify-center gap-2 transition shadow-lg ${
+            adicionado
+              ? 'bg-green-500 hover:bg-green-600'
+              : 'bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700'
+          } text-white`}
+        >
           <ShoppingCart className="w-5 h-5" />
-          Solicitar Compra
+          {adicionado ? 'Adicionado ao Carrinho!' : 'Solicitar Compra'}
         </button>
 
         {/* HorariosPopup com estilo roxo */}
@@ -57,16 +104,16 @@ export default function ProdutoAcoes({ price, vendedor }: ProdutoAcoesProps) {
               </span>
             )}
           </div>
-            <div className="flex-1">
-                <h3 className="font-semibold text-gray-800 mb-1">{vendedor.nome}</h3>
-                <div className="flex items-center gap-1 text-sm text-gray-600">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                    <p>Vendedor verificado</p>
-                </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-800 mb-1">{vendedor.nome}</h3>
+            <div className="flex items-center gap-1 text-sm text-gray-600">
+              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+              <p>Vendedor verificado</p>
             </div>
+          </div>
         </div>
 
-        {/* 🔗 Link para a página do vendedor */}
+        {/* Link para a página do vendedor */}
         <Link
           href={`/Vendedor`}
           className="block text-center w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-lg border-2 border-gray-300 transition"
