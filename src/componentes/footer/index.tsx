@@ -62,13 +62,13 @@ export function Footer(){
             </Link>
           </div>
 
-          {/* Botão de contato */}
+          {/* Botão de contato
           <Link
             href="#"
             className="inline-block bg-[#ff007f] text-white font-medium text-sm px-5 py-2 rounded-md hover:opacity-90 transition"
           >
             Contato
-          </Link>
+          </Link> */}
         </div>
       </div>
     </footer>
