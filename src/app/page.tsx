@@ -1,8 +1,9 @@
 import { Metadata } from "next";
-import { Search } from "lucide-react";
+import { Search, CheckCircle, X } from "lucide-react";
 import ProdutoCard from "@/componentes/Card_Produto/ProdutoCard";
 import BannerCarousel from "@/componentes/Home/Banner"
 import CategoriasSlider from "@/componentes/Home/Categorias";
+import SuccessModal from "@/componentes/Home/SuccessModal";
 
 export const metadata: Metadata = {
   title: "Celebraí - Pagina Principal",
@@ -64,7 +65,9 @@ export default async function Home() {
   const melhoresAvaliados = produtos.slice(5, 10);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-15 pb-10">
+    <>
+      <SuccessModal />
+      <div className="min-h-screen bg-gray-50 pt-15 pb-10">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-purple-600 to-purple-500 text-white py-12 px-4">
         <div className="max-w-6xl mx-auto">
@@ -156,6 +159,7 @@ export default async function Home() {
           )}
         </section>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

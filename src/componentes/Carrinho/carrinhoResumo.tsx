@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { AlertCircle, Tag, CreditCard, ChevronRight, Package } from "lucide-react";
 
 export default function CarrinhoResumo({
@@ -12,6 +13,7 @@ export default function CarrinhoResumo({
   aplicarCupom,
   itens,
 }: any) {
+  const router = useRouter();
   return (
     <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 sticky top-24">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Resumo do Pedido</h2>
@@ -90,7 +92,7 @@ export default function CarrinhoResumo({
       </div>
 
       <button
-        onClick={() => alert("Redirecionando para pagamento...")}
+        onClick={() => router.push("/Login")}
         className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-2 transition shadow-lg mb-4"
       >
         <CreditCard className="w-5 h-5" />
