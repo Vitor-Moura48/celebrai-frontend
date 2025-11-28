@@ -1,56 +1,123 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from 'react';
 import { FcGoogle } from "react-icons/fc";
-import { useCarrinho } from "@/Context/carrinhoContext";
+import { AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/Context/authContext';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginCard() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState(false);
+  
+  const { login } = useAuth();
   const router = useRouter();
-  const { limparCarrinho } = useCarrinho();
+  const searchParams = useSearchParams();
+  const tipo = (searchParams.get('tipo') as 'fornecedor' | 'consumidor') || 'consumidor';
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email && password) {
-      // Simula login bem-sucedido
-      localStorage.setItem("userLoggedIn", "true");
-      limparCarrinho();
-      // Redireciona para home com flag de sucesso
-      router.push("/?compraRealizada=true");
+  const handleSubmit = async () => {
+    setErro('');
+    setSucesso(false);
+
+    if (!email || !senha) {
+      setErro('Por favor, preencha todos os campos');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const success = await login(email, senha, tipo);
+      
+      if (success) {
+        setSucesso(true);
+        setTimeout(() => {
+          router.push('/');
+        }, 1000);
+      } else {
+        setErro('Email ou senha incorretos');
+      }
+    } catch (error) {
+      setErro('Erro ao fazer login. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
+    }
+  };
+
   return (
     <>
       <h1 className="text-2xl font-semibold mb-1">
         Acesse a sua conta <span className="text-[#ff007f]">Celebrai</span>!
       </h1>
+      
+      <p className="text-sm text-white/70 mt-2 mb-4">
+        Entrando como: <span className="font-semibold text-white">
+          {tipo === 'fornecedor' ? 'Fornecedor' : 'Consumidor'}
+        </span>
+      </p>
 
-      <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+      <div className="mt-6 space-y-4">
         <input
           type="email"
-          placeholder="Informe seu E-mail..."
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
-          required
+          onKeyPress={handleKeyPress}
+          placeholder="Informe seu E-mail..."
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] text-white"
+          disabled={loading || sucesso}
         />
 
         <input
           type="password"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder="Senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
-          required
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] text-white"
+          disabled={loading || sucesso}
         />
 
+        {/* Mensagem de erro */}
+        {erro && (
+          <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 text-red-300 flex-shrink-0 mt-0.5" />
+            <p className="text-red-200 text-sm font-medium">{erro}</p>
+          </div>
+        )}
+
+        {/* Mensagem de sucesso */}
+        {sucesso && (
+          <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-3 flex items-start gap-2">
+            <CheckCircle className="w-5 h-5 text-green-300 flex-shrink-0 mt-0.5" />
+            <p className="text-green-200 text-sm font-medium">Login realizado com sucesso!</p>
+          </div>
+        )}
+
         <button
-          type="submit"
-          className="w-full bg-[#ff007f] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition"
+          onClick={handleSubmit}
+          disabled={loading || sucesso}
+          className="w-full bg-[#ff007f] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          Continuar
+          {loading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Entrando...
+            </>
+          ) : sucesso ? (
+            <>
+              <CheckCircle className="w-5 h-5" />
+              Redirecionando...
+            </>
+          ) : (
+            'Continuar'
+          )}
         </button>
 
         <div className="flex items-center gap-3">
@@ -60,13 +127,24 @@ export default function LoginCard() {
         </div>
 
         <button
-          type="button"
-          className="w-full bg-white/20 border border-white/40 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-white/30 transition"
+          onClick={() => alert('Login com Google ainda não implementado')}
+          disabled={loading || sucesso}
+          className="w-full bg-white/20 border border-white/40 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-white/30 transition disabled:opacity-50"
         >
           <FcGoogle size={20} />
           <span className="text-sm font-medium">Continuar com o Google</span>
         </button>
-      </form>
+      </div>
+
+      {/* Credenciais de teste */}
+      <div className="mt-6 bg-white/10 border border-white/20 rounded-lg p-3 text-xs text-white/80">
+        <p className="font-semibold mb-2">🔑 Credenciais de teste:</p>
+        <div className="space-y-1">
+          <p><strong>Fornecedor:</strong> fornecedor@celebrai.com / 123456</p>
+          <p><strong>Consumidor:</strong> consumidor@celebrai.com / 123456</p>
+          <p><strong>Admin:</strong> admin@celebrai.com / admin123</p>
+        </div>
+      </div>
 
       <p className="text-xs text-white/60 mt-4 leading-snug">
         Ao continuar, você concorda com os{" "}

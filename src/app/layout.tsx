@@ -5,6 +5,7 @@ import "./globals.css";
 import { Header } from "../componentes/header"
 import { Footer } from "../componentes/footer"
 import { CarrinhoProvider } from "@/Context/carrinhoContext";
+import { AuthProvider } from "@/Context/authContext"; // ← ADICIONAR
 
 export default function RootLayout({
   children,
@@ -21,16 +22,14 @@ export default function RootLayout({
       <title>Celebraí</title>
       <link rel="icon" href="/Vector.svg" />
       
-      <body
-        className={`antialiased`}
-      >
-
-        <CarrinhoProvider>
-          <Header />
-          {children}
-          {!isLoginPage && <Footer />}
-        </CarrinhoProvider>
-
+      <body className={`antialiased`}>
+        <AuthProvider>
+          <CarrinhoProvider>
+            <Header />
+            {children}
+            {!isLoginPage && <Footer />}
+          </CarrinhoProvider>
+        </AuthProvider>
       </body>
     </html>
   );
