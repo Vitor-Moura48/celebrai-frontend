@@ -1,9 +1,10 @@
 import { Metadata } from "next";
 import { Search, CheckCircle, X } from "lucide-react";
 import ProdutoCard from "@/componentes/Card_Produto/ProdutoCard";
-import BannerCarousel from "@/componentes/Home/Banner"
+import BannerCarousel from "@/componentes/Home/Banner";
 import CategoriasSlider from "@/componentes/Home/Categorias";
 import SuccessModal from "@/componentes/Models/SuccesModal";
+import SearchBar from "@/componentes/Home/searchBar";
 
 export const metadata: Metadata = {
   title: "Celebraí - Pagina Principal",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Celebraí - Pagina Principal",
     description: "A busca pela festa ideal",
-    images: "/Vector.svg"
+    images: "/Vector.svg",
   },
   robots: {
     index: true,
@@ -20,9 +21,9 @@ export const metadata: Metadata = {
     nocache: true,
     googleBot: {
       index: true,
-      follow: true
-    }
-  }
+      follow: true,
+    },
+  },
 };
 
 // SSR — dados carregam no servidor
@@ -57,7 +58,7 @@ async function getCategorias() {
 export default async function Home() {
   const [produtos, categorias] = await Promise.all([
     getProdutos(),
-    getCategorias()
+    getCategorias(),
   ]);
 
   // Dividir produtos para as duas seções
@@ -65,8 +66,8 @@ export default async function Home() {
   const melhoresAvaliados = produtos.slice(5, 10);
 
   return (
-      <div className="min-h-screen bg-gray-50 pt-15 pb-10">
-       <SuccessModal /> 
+    <div className="min-h-screen bg-gray-50 pt-15 pb-10">
+      <SuccessModal />
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-purple-600 to-purple-500 text-white py-12 px-4">
         <div className="max-w-6xl mx-auto">
@@ -76,25 +77,9 @@ export default async function Home() {
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
             festa perfeita no <strong>Celebraí</strong>
           </h2>
-          
+
           {/* Search Bar */}
-          <form className="flex max-w-2xl mx-auto">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                name="search"
-                placeholder="Buscar 'Conjunto mesas e cadeiras'..."
-                 className="w-full bg-white pl-10 pr-4 py-3 rounded-l-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                />
-            </div>
-            <button 
-              type="submit"
-              className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-r-lg font-medium transition-colors"
-            >
-              Buscar
-            </button>
-          </form>
+          <SearchBar />
         </div>
       </div>
 
@@ -113,8 +98,8 @@ export default async function Home() {
           {produtosProntaEntrega.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {produtosProntaEntrega.map((produto: any) => (
-                <ProdutoCard 
-                  key={produto.id} 
+                <ProdutoCard
+                  key={produto.id}
                   id={produto.id}
                   title={produto.title}
                   price={produto.price}
@@ -141,7 +126,7 @@ export default async function Home() {
           {melhoresAvaliados.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {melhoresAvaliados.map((produto: any) => (
-                <ProdutoCard 
+                <ProdutoCard
                   key={produto.id}
                   id={produto.id}
                   title={produto.title}
@@ -158,6 +143,6 @@ export default async function Home() {
           )}
         </section>
       </div>
-      </div>
+    </div>
   );
 }
