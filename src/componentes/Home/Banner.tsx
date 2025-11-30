@@ -59,7 +59,9 @@ export default function BannerCarousel() {
           </button>
 
           <button
-            onClick={() => setCurrentSlide(Math.min(slides.length - 1, currentSlide + 1))}
+            onClick={() =>
+              setCurrentSlide(Math.min(slides.length - 1, currentSlide + 1))
+            }
             disabled={currentSlide === slides.length - 1}
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
