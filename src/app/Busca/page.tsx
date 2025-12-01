@@ -1,5 +1,5 @@
-import { Suspense } from "react";
-import BuscaClient from "./buscaCliente";
+import { Suspense } from 'react';
+import BuscaClient from './buscaCliente';
 
 export default function Page() {
   return (

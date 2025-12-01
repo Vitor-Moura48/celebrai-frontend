@@ -1,9 +1,9 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import ProdutoCard from "@/componentes/Card_Produto/ProdutoCard";
 import Breadcrumb from "@/componentes/Categorias/Navegacao";
 import CategoriaHeader from "@/componentes/Categorias/cabecalho";
 import Paginacao from "@/componentes/Categorias/Paginacao";
-import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -12,35 +12,69 @@ interface PageProps {
   searchParams: Promise<{ page?: string }>;
 }
 
-async function getProdutos(categoria: string) {
-  const apiCategories = ["electronics", "jewelery", "men's clothing", "women's clothing"];
-  const url = apiCategories.includes(categoria)
-    ? `https://fakestoreapi.com/products/category/${categoria}`
-    : `https://fakestoreapi.com/products`;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5156';
 
+const CATEGORIAS_MAP: { [key: string]: string } = {
+  'casamento-kits': 'Casamento',
+  'recepcao-kits': 'Recepção',
+  'cerimonia-kits': 'Cerimônia',
+  'aniversario-kits': 'Aniversário',
+  'infantil-kits': 'Infantil',
+  'adulto-kits': 'Adulto',
+  'corporativos-kits': 'Corporativos',
+  'casamento-orcamentos': 'Casamento',
+  'aniversario-orcamentos': 'Aniversário',
+  'corporativos-orcamentos': 'Corporativos',
+};
+
+const CATEGORIAS_NOMES: { [key: string]: string } = {
+  'casamento-kits': 'Casamento - Kits',
+  'recepcao-kits': 'Recepção - Kits',
+  'cerimonia-kits': 'Cerimônia - Kits',
+  'aniversario-kits': 'Aniversário - Kits',
+  'infantil-kits': 'Infantil - Kits',
+  'adulto-kits': 'Adulto - Kits',
+  'corporativos-kits': 'Corporativos - Kits',
+  'casamento-orcamentos': 'Casamento - Orçamentos',
+  'aniversario-orcamentos': 'Aniversário - Orçamentos',
+  'corporativos-orcamentos': 'Corporativos - Orçamentos',
+};
+
+async function getProdutos(slug: string) {
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const nomeCategoria = CATEGORIAS_MAP[slug];
+
+    // Busca todos os produtos
+    const res = await fetch(`${API_URL}/produto`, {
+      cache: "no-store",
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
     if (!res.ok) throw new Error("Erro ao buscar produtos");
-    return res.json();
+    const data = await res.json();
+    const todosProdutos = Array.isArray(data) ? data : [];
+
+    if (!nomeCategoria) {
+      return todosProdutos;
+    }
+
+    // Filtra pela subcategoria usando o nome
+    return todosProdutos.filter((p: any) => p.subCategoria === nomeCategoria);
   } catch (error) {
     console.error("Erro ao buscar produtos:", error);
     return [];
   }
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+} export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const categoria = decodeURIComponent(slug);
-  
-  const categoriaFormatada =
-    categoria.charAt(0).toUpperCase() + categoria.slice(1);
-  
+  const categoriaNome = CATEGORIAS_NOMES[slug] || slug;
+
   return {
-    title: `${categoriaFormatada} | Celebraí`,
-    description: `Encontre os melhores produtos de ${categoria} para sua festa`,
+    title: `${categoriaNome} | Celebraí`,
+    description: `Encontre os melhores produtos de ${categoriaNome} para sua festa`,
     openGraph: {
-      title: `${categoria} | Celebraí`,
-      description: `Confira os melhores produtos da categoria ${categoria}.`,
+      title: `${categoriaNome} | Celebraí`,
+      description: `Confira os melhores produtos da categoria ${categoriaNome}.`,
     },
   };
 }
@@ -49,11 +83,11 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
   const { slug } = await params;
   const { page: pageParam } = await searchParams;
 
-  const categoria = decodeURIComponent(slug);
+  const categoriaNome = CATEGORIAS_NOMES[slug] || slug;
   const currentPage = Number(pageParam) || 1;
   const itemsPerPage = 15;
 
-  const todosProdutos = await getProdutos(categoria);
+  const todosProdutos = await getProdutos(slug);
   const totalItems = todosProdutos.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const produtosPaginados = todosProdutos.slice(
@@ -65,10 +99,10 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-10">
       <div className="max-w-7xl mx-auto px-6">
         {/* Navegação */}
-        <Breadcrumb categoria={categoria} />
+        <Breadcrumb categoria={categoriaNome} />
 
         {/* Cabeçalho */}
-        <CategoriaHeader categoria={categoria} totalItems={totalItems} />
+        <CategoriaHeader categoria={categoriaNome} totalItems={totalItems} />
 
         {/* Lista de Produtos */}
         {produtosPaginados.length > 0 ? (
@@ -79,14 +113,14 @@ export default async function CategoriaPage({ params, searchParams }: PageProps)
             >
               {produtosPaginados.map((produto: any) => (
                 <div
-                  key={produto.id}
+                  key={produto.idProduto}
                   className="transition-transform transform hover:-translate-y-1"
                 >
                   <ProdutoCard
-                    id={produto.id}
-                    title={produto.title}
-                    price={produto.price}
-                    image={produto.image}
+                    id={produto.idProduto}
+                    title={produto.nome}
+                    price={produto.precoUnitario}
+                    image={produto.imagemUrl}
                     location="Recife, PE"
                   />
                 </div>

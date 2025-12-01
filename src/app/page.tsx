@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { Search, CheckCircle, X } from "lucide-react";
 import ProdutoCard from "@/componentes/Card_Produto/ProdutoCard";
 import BannerCarousel from "@/componentes/Home/Banner";
 import CategoriasSlider from "@/componentes/Home/Categorias";
@@ -29,41 +28,46 @@ export const metadata: Metadata = {
 // SSR — dados carregam no servidor
 export const dynamic = "force-dynamic";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5156';
+
 async function getProdutos() {
   try {
-    const res = await fetch("https://fakestoreapi.com/products?limit=10", {
+    const res = await fetch(`${API_URL}/produto`, {
       cache: "no-store",
+      headers: {
+        'Accept': 'application/json',
+      },
     });
     if (!res.ok) throw new Error("Falha ao buscar produtos");
-    return res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("Erro ao buscar produtos:", error);
     return [];
   }
 }
 
-async function getCategorias() {
-  try {
-    const res = await fetch("https://fakestoreapi.com/products/categories", {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Falha ao buscar categorias");
-    return res.json();
-  } catch (error) {
-    console.error("Erro ao buscar categorias:", error);
-    return [];
-  }
+async function getSubCategorias() {
+  // Retorna categorias hardcoded baseadas no banco de dados
+  return [
+    { idSubcategoria: 1, nome: 'Casamento - Kits', slug: 'casamento-kits' },
+    { idSubcategoria: 2, nome: 'Recepção - Kits', slug: 'recepcao-kits' },
+    { idSubcategoria: 3, nome: 'Cerimônia - Kits', slug: 'cerimonia-kits' },
+    { idSubcategoria: 4, nome: 'Aniversário - Kits', slug: 'aniversario-kits' },
+    { idSubcategoria: 5, nome: 'Infantil - Kits', slug: 'infantil-kits' },
+    { idSubcategoria: 6, nome: 'Adulto - Kits', slug: 'adulto-kits' },
+    { idSubcategoria: 7, nome: 'Corporativos - Kits', slug: 'corporativos-kits' },
+    { idSubcategoria: 8, nome: 'Casamento - Orçamentos', slug: 'casamento-orcamentos' },
+    { idSubcategoria: 9, nome: 'Aniversário - Orçamentos', slug: 'aniversario-orcamentos' },
+    { idSubcategoria: 10, nome: 'Corporativos - Orçamentos', slug: 'corporativos-orcamentos' },
+  ];
 }
 
 export default async function Home() {
   const [produtos, categorias] = await Promise.all([
     getProdutos(),
-    getCategorias(),
+    getSubCategorias(),
   ]);
-
-  // Dividir produtos para as duas seções
-  const produtosProntaEntrega = produtos.slice(0, 5);
-  const melhoresAvaliados = produtos.slice(5, 10);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-15 pb-10">
@@ -95,43 +99,15 @@ export default async function Home() {
           <h3 className="text-xl font-bold text-gray-900 mb-4">
             Produtos para pronta entrega
           </h3>
-          {produtosProntaEntrega.length > 0 ? (
+          {produtos.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {produtosProntaEntrega.map((produto: any) => (
+              {produtos.map((produto: any) => (
                 <ProdutoCard
-                  key={produto.id}
-                  id={produto.id}
-                  title={produto.title}
-                  price={produto.price}
-                  image={produto.image}
-                  location="Recife, PE"
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-8">
-              Nenhum produto disponível no momento.
-            </p>
-          )}
-        </section>
-
-        {/* Banner Carousel */}
-        <BannerCarousel />
-
-        {/* Melhores Avaliados */}
-        <section>
-          <h3 className="text-xl font-bold text-gray-900 mb-4">
-            Melhores Avaliados
-          </h3>
-          {melhoresAvaliados.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {melhoresAvaliados.map((produto: any) => (
-                <ProdutoCard
-                  key={produto.id}
-                  id={produto.id}
-                  title={produto.title}
-                  price={produto.price}
-                  image={produto.image}
+                  key={produto.idProduto}
+                  id={produto.idProduto}
+                  title={produto.nome}
+                  price={produto.precoUnitario}
+                  image={produto.imagemUrl}
                   location="Recife, PE"
                 />
               ))}

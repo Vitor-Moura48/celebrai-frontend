@@ -3,129 +3,233 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
-import { useCarrinho } from "@/Context/carrinhoContext";
+import authService from "@/lib/api/services/authService";
 
 export default function RegisterCard() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    nome: "",
+    sobrenome: "",
     cpf: "",
-    phone: "",
-    birthDate: "",
+    telefone: "",
+    dataNascimento: "",
     cep: "",
     email: "",
-    password: "",
-    confirmPassword: "",
+    senha: "",
+    confirmarSenha: "",
   });
 
-  const router = useRouter();
-  const { limparCarrinho } = useCarrinho();
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      formData.email &&
-      formData.password &&
-      formData.password === formData.confirmPassword &&
-      formData.firstName &&
-      formData.lastName
-    ) {
-      // Simula registro bem-sucedido
-      localStorage.setItem("userLoggedIn", "true");
-      limparCarrinho();
-      // Redireciona para home com flag de sucesso
-      router.push("/?compraRealizada=true");
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    // Validações
+    if (formData.senha !== formData.confirmarSenha) {
+      setError("As senhas não coincidem");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.senha.length < 6) {
+      setError("A senha deve ter no mínimo 6 caracteres");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Preparar dados para o backend (formato esperado pela API C#)
+      const registroData = {
+        nome: `${formData.nome} ${formData.sobrenome}`,
+        email: formData.email,
+        senha: formData.senha,
+        cpfUsuario: formData.cpf.replace(/\D/g, ""), // Remove formatação
+        celular: formData.telefone.replace(/\D/g, ""), // Remove formatação
+        dataNascimento: formData.dataNascimento,
+        cep: formData.cep.replace(/\D/g, ""), // Remove formatação
+      };
+
+      console.log("📤 Dados enviando para o backend:", registroData);
+      const response = await authService.registrar(registroData);
+      console.log("✅ Cadastro bem-sucedido:", response);
+
+      // Mostrar mensagem de sucesso do backend (use cast to any para evitar erro de tipagem)
+      const mensagem =
+        (response as any)?.message ||
+        (response as any)?.data?.message ||
+        "Cadastro realizado com sucesso! Faça login para continuar.";
+      setSuccess(mensagem);
+
+      // Aguardar 3 segundos e redirecionar para login
+      setTimeout(() => {
+        window.location.reload(); // Recarrega para mostrar o Card_Login
+      }, 3000);
+
+    } catch (err: any) {
+      console.error("❌ Erro no cadastro:", err);
+      console.error("❌ Resposta do erro:", err.response?.data);
+      console.error("❌ Status:", err.response?.status);
+      console.error("❌ Headers:", err.response?.headers);
+
+      // Extrair mensagens de erro
+      let mensagemErro = "Erro ao criar conta. Tente novamente.";
+
+      if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
+        mensagemErro = err.response.data.errors.join(", ");
+      } else if (err.response?.data?.message) {
+        mensagemErro = err.response.data.message;
+      } else if (err.response?.data) {
+        mensagemErro = JSON.stringify(err.response.data);
+      } else if (err.response?.status) {
+        mensagemErro = `Erro HTTP ${err.response.status}`;
+      }
+
+      setError(mensagemErro);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
     <>
       <h1 className="text-2xl font-semibold mb-1">
         Crie sua conta <span className="text-[#ff007f]">Celebrai</span>!
       </h1>
 
+      {error && (
+        <div className="mt-4 bg-red-500/20 border border-red-500/50 rounded-lg px-4 py-2 text-sm text-red-200">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="mt-4 bg-green-500/20 border border-green-500/50 rounded-lg px-4 py-2 text-sm text-green-200">
+          {success}
+        </div>
+      )}
+
       <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
         <div className="flex gap-2">
           <input
             type="text"
+            name="nome"
+            value={formData.nome}
+            onChange={handleChange}
             placeholder="Nome"
-            value={formData.firstName}
-            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-            className="w-1/2 bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
             required
+            disabled={loading}
+            className="w-1/2 bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
           />
           <input
             type="text"
+            name="sobrenome"
+            value={formData.sobrenome}
+            onChange={handleChange}
             placeholder="Sobrenome"
-            value={formData.lastName}
-            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-            className="w-1/2 bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
             required
+            disabled={loading}
+            className="w-1/2 bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
           />
         </div>
 
         <input
           type="text"
-          placeholder="CPF"
+          name="cpf"
           value={formData.cpf}
-          onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
+          onChange={handleChange}
+          placeholder="CPF"
+          required
+          disabled={loading}
+          maxLength={14}
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
         />
 
         <input
           type="tel"
+          name="telefone"
+          value={formData.telefone}
+          onChange={handleChange}
           placeholder="Número de telefone"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
+          required
+          disabled={loading}
+          maxLength={15}
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
         />
 
         <input
           type="date"
-          value={formData.birthDate}
-          onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
+          name="dataNascimento"
+          value={formData.dataNascimento}
+          onChange={handleChange}
+          required
+          disabled={loading}
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
         />
 
         <input
           type="text"
-          placeholder="CEP"
+          name="cep"
           value={formData.cep}
-          onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
+          onChange={handleChange}
+          placeholder="CEP"
+          required
+          disabled={loading}
+          maxLength={9}
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
         />
 
         <input
           type="email"
-          placeholder="Informe seu E-mail..."
+          name="email"
           value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
+          onChange={handleChange}
+          placeholder="Informe seu E-mail..."
           required
+          disabled={loading}
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
         />
 
         <input
           type="password"
+          name="senha"
+          value={formData.senha}
+          onChange={handleChange}
           placeholder="Senha"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
           required
+          disabled={loading}
+          minLength={6}
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
         />
 
         <input
           type="password"
+          name="confirmarSenha"
+          value={formData.confirmarSenha}
+          onChange={handleChange}
           placeholder="Confirme a senha"
-          value={formData.confirmPassword}
-          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
           required
+          disabled={loading}
+          minLength={6}
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
         />
 
         <button
           type="submit"
-          className="w-full bg-[#ff007f] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition"
+          disabled={loading}
+          className="w-full bg-[#ff007f] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Registrar-se
+          {loading ? "Registrando..." : "Registrar-se"}
         </button>
 
         <div className="flex items-center gap-3">

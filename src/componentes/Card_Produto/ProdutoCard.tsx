@@ -32,7 +32,7 @@ export default function ProdutoCard({
       <div className="p-3">
         <p className="text-sm font-semibold line-clamp-2">{title}</p>
         <p className="text-sm text-gray-800 mt-1">
-          R$ {(price * 5).toFixed(2)}
+          R$ {price.toFixed(2)}
         </p>
         <p className="flex items-center text-sm text-gray-600 mt-1">
           <MapPin size={14} className="mr-1" /> {location}

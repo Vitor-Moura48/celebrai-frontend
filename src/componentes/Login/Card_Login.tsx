@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { AlertCircle, Loader2, CheckCircle } from 'lucide-react';
-import { useAuth } from '@/Context/authContext';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from "@/Context/authContext";
 
 export default function LoginCard() {
+  const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
-  
-  const { login } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const tipo = (searchParams.get('tipo') as 'fornecedor' | 'consumidor') || 'consumidor';
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setErro('');
     setSucesso(false);
 
@@ -28,8 +28,8 @@ export default function LoginCard() {
     setLoading(true);
 
     try {
-      const success = await login(email, senha, tipo);
-      
+      const success = await login(email, senha, 'consumidor');
+
       if (success) {
         setSucesso(true);
         setTimeout(() => {
@@ -38,8 +38,20 @@ export default function LoginCard() {
       } else {
         setErro('Email ou senha incorretos');
       }
-    } catch (error) {
-      setErro('Erro ao fazer login. Tente novamente.');
+    } catch (error: any) {
+      console.error("❌ Erro no login:", error);
+
+      let mensagemErro = "Erro ao fazer login. Tente novamente.";
+
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        mensagemErro = error.response.data.errors.join(", ");
+      } else if (error.response?.data?.message) {
+        mensagemErro = error.response.data.message;
+      } else if (error.response?.status === 401) {
+        mensagemErro = "Email ou senha incorretos";
+      }
+
+      setErro(mensagemErro);
     } finally {
       setLoading(false);
     }
@@ -47,7 +59,7 @@ export default function LoginCard() {
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleSubmit();
+      handleSubmit(e as any);
     }
   };
 
@@ -56,14 +68,8 @@ export default function LoginCard() {
       <h1 className="text-2xl font-semibold mb-1">
         Acesse a sua conta <span className="text-[#ff007f]">Celebrai</span>!
       </h1>
-      
-      <p className="text-sm text-white/70 mt-2 mb-4">
-        Entrando como: <span className="font-semibold text-white">
-          {tipo === 'fornecedor' ? 'Fornecedor' : 'Consumidor'}
-        </span>
-      </p>
 
-      <div className="mt-6 space-y-4">
+      <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
         <input
           type="email"
           value={email}
@@ -72,6 +78,7 @@ export default function LoginCard() {
           placeholder="Informe seu E-mail..."
           className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] text-white"
           disabled={loading || sucesso}
+          required
         />
 
         <input
@@ -82,6 +89,7 @@ export default function LoginCard() {
           placeholder="Senha"
           className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] text-white"
           disabled={loading || sucesso}
+          required
         />
 
         {/* Mensagem de erro */}
@@ -101,7 +109,7 @@ export default function LoginCard() {
         )}
 
         <button
-          onClick={handleSubmit}
+          type="submit"
           disabled={loading || sucesso}
           className="w-full bg-[#ff007f] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
         >
@@ -127,6 +135,7 @@ export default function LoginCard() {
         </div>
 
         <button
+          type="button"
           onClick={() => alert('Login com Google ainda não implementado')}
           disabled={loading || sucesso}
           className="w-full bg-white/20 border border-white/40 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-white/30 transition disabled:opacity-50"
@@ -134,17 +143,7 @@ export default function LoginCard() {
           <FcGoogle size={20} />
           <span className="text-sm font-medium">Continuar com o Google</span>
         </button>
-      </div>
-
-      {/* Credenciais de teste */}
-      <div className="mt-6 bg-white/10 border border-white/20 rounded-lg p-3 text-xs text-white/80">
-        <p className="font-semibold mb-2">🔑 Credenciais de teste:</p>
-        <div className="space-y-1">
-          <p><strong>Fornecedor:</strong> fornecedor@celebrai.com / 123456</p>
-          <p><strong>Consumidor:</strong> consumidor@celebrai.com / 123456</p>
-          <p><strong>Admin:</strong> admin@celebrai.com / admin123</p>
-        </div>
-      </div>
+      </form>
 
       <p className="text-xs text-white/60 mt-4 leading-snug">
         Ao continuar, você concorda com os{" "}
