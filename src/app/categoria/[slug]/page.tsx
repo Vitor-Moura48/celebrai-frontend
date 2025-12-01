@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import ProdutoCard from "@/componentes/Card_Produto/ProdutoCard";
 import Breadcrumb from "@/componentes/Categorias/Navegacao";
 import CategoriaHeader from "@/componentes/Categorias/cabecalho";

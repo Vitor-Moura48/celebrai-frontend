@@ -69,10 +69,6 @@ export default async function Home() {
     getSubCategorias(),
   ]);
 
-  // Dividir produtos para as duas seções
-  const produtosProntaEntrega = produtos.slice(0, 5);
-  const melhoresAvaliados = produtos.slice(5, 10);
-
   return (
     <div className="min-h-screen bg-gray-50 pt-15 pb-10">
       <SuccessModal />
@@ -103,37 +99,9 @@ export default async function Home() {
           <h3 className="text-xl font-bold text-gray-900 mb-4">
             Produtos para pronta entrega
           </h3>
-          {produtosProntaEntrega.length > 0 ? (
+          {produtos.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {produtosProntaEntrega.map((produto: any) => (
-                <ProdutoCard
-                  key={produto.idProduto}
-                  id={produto.idProduto}
-                  title={produto.nome}
-                  price={produto.precoUnitario}
-                  image={produto.imagemUrl}
-                  location="Recife, PE"
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-8">
-              Nenhum produto disponível no momento.
-            </p>
-          )}
-        </section>
-
-        {/* Banner Carousel */}
-        <BannerCarousel />
-
-        {/* Melhores Avaliados */}
-        <section>
-          <h3 className="text-xl font-bold text-gray-900 mb-4">
-            Melhores Avaliados
-          </h3>
-          {melhoresAvaliados.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {melhoresAvaliados.map((produto: any) => (
+              {produtos.map((produto: any) => (
                 <ProdutoCard
                   key={produto.idProduto}
                   id={produto.idProduto}

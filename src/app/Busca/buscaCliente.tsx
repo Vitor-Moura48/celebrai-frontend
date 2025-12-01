@@ -7,21 +7,20 @@ import ProdutoCard from '@/componentes/Card_Produto/ProdutoCard';
 import Link from 'next/link';
 
 interface Produto {
-  id: number;
-  title: string;
-  price: number;
-  image: string;
-  category: string;
-  rating: {
-    rate: number;
-    count: number;
-  };
+  idProduto: number;
+  nome: string;
+  descricao: string;
+  subCategoria: string;
+  precoUnitario: number;
+  imagemUrl: string;
 }
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5156';
 
 export default function BuscaClient() {
   const searchParams = useSearchParams();
   const queryInicial = searchParams.get('q') || '';
-  
+
   const [query, setQuery] = useState(queryInicial);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produtosFiltrados, setProdutosFiltrados] = useState<Produto[]>([]);
@@ -37,18 +36,26 @@ export default function BuscaClient() {
     async function fetchProdutos() {
       try {
         setLoading(true);
-        const [produtosRes, categoriasRes] = await Promise.all([
-          fetch('https://fakestoreapi.com/products'),
-          fetch('https://fakestoreapi.com/products/categories')
-        ]);
-        
-        const produtosData = await produtosRes.json();
-        const categoriasData = await categoriasRes.json();
-        
+        const response = await fetch(`${API_URL}/produto`, {
+          cache: 'no-store',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+
+        if (!response.ok) throw new Error('Erro ao buscar produtos');
+
+        const data = await response.json();
+        const produtosData = Array.isArray(data) ? data : [];
+
         setProdutos(produtosData);
-        setCategorias(['todas', ...categoriasData]);
+
+        // Extrair categorias únicas
+        const categoriasUnicas = Array.from(new Set(produtosData.map((p: Produto) => p.subCategoria)));
+        setCategorias(['todas', ...categoriasUnicas]);
       } catch (error) {
         console.error('Erro ao buscar produtos:', error);
+        setProdutos([]);
       } finally {
         setLoading(false);
       }
@@ -64,35 +71,36 @@ export default function BuscaClient() {
     // Filtro por busca
     if (query) {
       resultado = resultado.filter(produto =>
-        produto.title.toLowerCase().includes(query.toLowerCase()) ||
-        produto.category.toLowerCase().includes(query.toLowerCase())
+        produto.nome.toLowerCase().includes(query.toLowerCase()) ||
+        produto.descricao.toLowerCase().includes(query.toLowerCase()) ||
+        produto.subCategoria.toLowerCase().includes(query.toLowerCase())
       );
     }
 
     // Filtro por categoria
     if (categoriaSelecionada !== 'todas') {
-      resultado = resultado.filter(p => p.category === categoriaSelecionada);
+      resultado = resultado.filter(p => p.subCategoria === categoriaSelecionada);
     }
 
     // Filtro por preço
     resultado = resultado.filter(p => {
-      const preco = p.price * 5; // Multiplicador para simular preços reais
+      const preco = p.precoUnitario;
       return preco >= faixaPreco[0] && preco <= faixaPreco[1];
     });
 
     // Ordenação
     switch (ordenacao) {
       case 'menor-preco':
-        resultado.sort((a, b) => a.price - b.price);
+        resultado.sort((a, b) => a.precoUnitario - b.precoUnitario);
         break;
       case 'maior-preco':
-        resultado.sort((a, b) => b.price - a.price);
+        resultado.sort((a, b) => b.precoUnitario - a.precoUnitario);
         break;
-      case 'mais-vendidos':
-        resultado.sort((a, b) => b.rating.count - a.rating.count);
+      case 'nome-a-z':
+        resultado.sort((a, b) => a.nome.localeCompare(b.nome));
         break;
-      case 'melhor-avaliacao':
-        resultado.sort((a, b) => b.rating.rate - a.rating.rate);
+      case 'nome-z-a':
+        resultado.sort((a, b) => b.nome.localeCompare(a.nome));
         break;
       default:
         // relevância
@@ -104,7 +112,7 @@ export default function BuscaClient() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!query.trim()) {
       alert('Por favor, digite algo para buscar!');
       return;
@@ -125,7 +133,7 @@ export default function BuscaClient() {
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-6">
             Buscar Produtos
           </h1>
-          
+
           {/* Search Bar */}
           <form onSubmit={handleSubmit} className="flex max-w-2xl mx-auto">
             <div className="flex-1 relative">
@@ -138,7 +146,7 @@ export default function BuscaClient() {
                 className="w-full bg-white pl-10 pr-4 py-3 rounded-l-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
-            <button 
+            <button
               type="submit"
               className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-r-lg font-medium transition-colors"
             >
@@ -217,8 +225,8 @@ export default function BuscaClient() {
                   <option value="relevancia">Mais relevantes</option>
                   <option value="menor-preco">Menor preço</option>
                   <option value="maior-preco">Maior preço</option>
-                  <option value="mais-vendidos">Mais vendidos</option>
-                  <option value="melhor-avaliacao">Melhor avaliação</option>
+                  <option value="nome-a-z">Nome (A-Z)</option>
+                  <option value="nome-z-a">Nome (Z-A)</option>
                 </select>
               </div>
 
@@ -251,11 +259,11 @@ export default function BuscaClient() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {produtosFiltrados.map((produto) => (
               <ProdutoCard
-                key={produto.id}
-                id={produto.id}
-                title={produto.title}
-                price={produto.price}
-                image={produto.image}
+                key={produto.idProduto}
+                id={produto.idProduto}
+                title={produto.nome}
+                price={produto.precoUnitario}
+                image={produto.imagemUrl}
                 location="Recife, PE"
               />
             ))}
