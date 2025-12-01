@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import LoginCard from "@/componentes/Login/Card_Login";
 import RegisterCard from "@/componentes/Login/Card_Registro";
 
-export default function LoginPage() {
+function LoginContent() {
   const [isRegister, setIsRegister] = useState(false);
 
   return (
@@ -27,5 +27,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
