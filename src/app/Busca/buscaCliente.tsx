@@ -1,9 +1,10 @@
-import { useState, useEffect, Suspense } from 'react';
+"use client";
+
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Filter, X, MapPin, SlidersHorizontal } from 'lucide-react';
 import ProdutoCard from '@/componentes/Card_Produto/ProdutoCard';
 import Link from 'next/link';
-import BuscaClient from './buscaCliente';
 
 interface Produto {
   id: number;
@@ -17,10 +18,10 @@ interface Produto {
   };
 }
 
-function BuscaContent() {
+export default function BuscaClient() {
   const searchParams = useSearchParams();
   const queryInicial = searchParams.get('q') || '';
-
+  
   const [query, setQuery] = useState(queryInicial);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produtosFiltrados, setProdutosFiltrados] = useState<Produto[]>([]);
@@ -40,10 +41,10 @@ function BuscaContent() {
           fetch('https://fakestoreapi.com/products'),
           fetch('https://fakestoreapi.com/products/categories')
         ]);
-
+        
         const produtosData = await produtosRes.json();
         const categoriasData = await categoriasRes.json();
-
+        
         setProdutos(produtosData);
         setCategorias(['todas', ...categoriasData]);
       } catch (error) {
@@ -94,7 +95,7 @@ function BuscaContent() {
         resultado.sort((a, b) => b.rating.rate - a.rating.rate);
         break;
       default:
-        // relevância (padrão)
+        // relevância
         break;
     }
 
@@ -103,7 +104,7 @@ function BuscaContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!query.trim()) {
       alert('Por favor, digite algo para buscar!');
       return;
@@ -124,7 +125,7 @@ function BuscaContent() {
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-6">
             Buscar Produtos
           </h1>
-
+          
           {/* Search Bar */}
           <form onSubmit={handleSubmit} className="flex max-w-2xl mx-auto">
             <div className="flex-1 relative">
@@ -137,7 +138,7 @@ function BuscaContent() {
                 className="w-full bg-white pl-10 pr-4 py-3 rounded-l-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
-            <button
+            <button 
               type="submit"
               className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-r-lg font-medium transition-colors"
             >
@@ -278,18 +279,5 @@ function BuscaContent() {
         )}
       </div>
     </div>
-  );
-}
-
-
-export default function PaginaBusca() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 pt-18 pb-10 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
-      </div>
-    }>
-      <BuscaContent />
-    </Suspense>
   );
 }

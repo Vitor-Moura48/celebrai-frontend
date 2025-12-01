@@ -1,6 +1,7 @@
-"use client";
-
-import { AlertCircle, Tag, CreditCard, ChevronRight, Package } from "lucide-react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { AlertCircle, Tag, CreditCard, ChevronRight, Package, Loader2 } from "lucide-react";
+import { useAuth } from '@/Context/authContext';
 
 export default function CarrinhoResumo({
   subtotal,
@@ -12,6 +13,23 @@ export default function CarrinhoResumo({
   aplicarCupom,
   itens,
 }: any) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const {isAuthenticated} = useAuth();
+  const handleFinalizarAluguel = async () => {
+    setLoading(true);
+    
+    // Simular processamento
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Redirecionar para home com parâmetro de sucesso
+    {isAuthenticated ? (
+                           router.push("/?aluguelRealizado=true")
+                    ) : (
+                           router.push("/Login")
+                    )}
+  };
+
   return (
     <div className="bg-white rounded-2xl border-2 border-gray-200 p-6 sticky top-24">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Resumo do Pedido</h2>
@@ -27,11 +45,12 @@ export default function CarrinhoResumo({
             placeholder="Digite seu cupom"
             value={cupom}
             onChange={(e) => setCupom(e.target.value)}
-            className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none"
+            disabled={loading}
+            className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-pink-500 focus:outline-none disabled:opacity-50"
           />
           <button
             onClick={aplicarCupom}
-            disabled={cupomAplicado}
+            disabled={cupomAplicado || loading}
             className="px-4 py-2 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-300 text-white font-semibold rounded-lg transition"
           >
             Aplicar
@@ -90,12 +109,22 @@ export default function CarrinhoResumo({
       </div>
 
       <button
-        onClick={() => alert("Redirecionando para pagamento...")}
-        className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-2 transition shadow-lg mb-4"
+        onClick={handleFinalizarAluguel}
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-2 transition shadow-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <CreditCard className="w-5 h-5" />
-        Continuar para pagamento
-        <ChevronRight className="w-5 h-5" />
+        {loading ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Processando...
+          </>
+        ) : (
+          <>
+            <CreditCard className="w-5 h-5" />
+            Finalizar Aluguel
+            <ChevronRight className="w-5 h-5" />
+          </>
+        )}
       </button>
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-gray-700">
@@ -103,7 +132,7 @@ export default function CarrinhoResumo({
           <Package className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <p>
             <span className="font-semibold">Entrega:</span> Entre em contato com o vendedor
-            para calcular o frete e combinar a entrega.
+            para calcular o frete e combinar a entrega/retirada.
           </p>
         </div>
       </div>

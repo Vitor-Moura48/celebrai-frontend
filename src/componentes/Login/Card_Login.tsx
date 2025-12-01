@@ -3,87 +3,32 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
-import authService from "@/lib/api/services/authService";
 
 export default function LoginCard() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [formData, setFormData] = useState({
-    email: "",
-    senha: "",
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const response = await authService.login(formData);
-
-      // Token já foi salvo automaticamente pelo authService
-      console.log("Login bem-sucedido:", response);
-
-      // Redirecionar para home ou dashboard
-      router.push("/");
-
-    } catch (err: any) {
-      console.error("Erro no login:", err);
-      setError(err.response?.data?.message || "Erro ao fazer login. Verifique suas credenciais.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   return (
     <>
       <h1 className="text-2xl font-semibold mb-1">
         Acesse a sua conta <span className="text-[#ff007f]">Celebrai</span>!
       </h1>
 
-      {error && (
-        <div className="mt-4 bg-red-500/20 border border-red-500/50 rounded-lg px-4 py-2 text-sm text-red-200">
-          {error}
-        </div>
-      )}
-
-      <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+      <form className="mt-6 space-y-4">
         <input
           type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
           placeholder="Informe seu E-mail..."
-          required
-          disabled={loading}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
         />
 
         <input
           type="password"
-          name="senha"
-          value={formData.senha}
-          onChange={handleChange}
           placeholder="Senha"
-          required
-          disabled={loading}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
+          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f]"
         />
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-[#ff007f] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-[#ff007f] text-white py-2 rounded-lg font-semibold hover:opacity-90 transition"
         >
-          {loading ? "Entrando..." : "Continuar"}
+          Continuar
         </button>
 
         <div className="flex items-center gap-3">
@@ -93,13 +38,24 @@ export default function LoginCard() {
         </div>
 
         <button
-          type="button"
-          className="w-full bg-white/20 border border-white/40 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-white/30 transition"
+          onClick={() => alert('Login com Google ainda não implementado')}
+          disabled={loading || sucesso}
+          className="w-full bg-white/20 border border-white/40 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-white/30 transition disabled:opacity-50"
         >
           <FcGoogle size={20} />
           <span className="text-sm font-medium">Continuar com o Google</span>
         </button>
-      </form>
+      </div>
+
+      {/* Credenciais de teste */}
+      <div className="mt-6 bg-white/10 border border-white/20 rounded-lg p-3 text-xs text-white/80">
+        <p className="font-semibold mb-2">🔑 Credenciais de teste:</p>
+        <div className="space-y-1">
+          <p><strong>Fornecedor:</strong> fornecedor@celebrai.com / 123456</p>
+          <p><strong>Consumidor:</strong> consumidor@celebrai.com / 123456</p>
+          <p><strong>Admin:</strong> admin@celebrai.com / admin123</p>
+        </div>
+      </div>
 
       <p className="text-xs text-white/60 mt-4 leading-snug">
         Ao continuar, você concorda com os{" "}
