@@ -57,6 +57,10 @@ export default function RegisterCard() {
       const response = await authService.registrar(registroData);
       console.log("✅ Cadastro bem-sucedido:", response);
 
+      // Salvar telefone temporariamente no localStorage para usar após o login
+      localStorage.setItem('celebrai_user_telefone', formData.telefone);
+      localStorage.setItem('celebrai_user_cep', formData.cep);
+
       // Mostrar mensagem de sucesso do backend (use cast to any para evitar erro de tipagem)
       const mensagem =
         (response as any)?.message ||

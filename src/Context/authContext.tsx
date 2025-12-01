@@ -27,13 +27,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Verificar se há token e nome de usuário salvos
     const token = localStorage.getItem('celebrai_token');
     const userName = localStorage.getItem('celebrai_user_name');
+    const userEmail = localStorage.getItem('celebrai_user_email');
+    const userRole = localStorage.getItem('celebrai_user_role');
 
     if (token && userName) {
-      // Usuário está autenticado
+      // Decodificar o token para pegar a role se não estiver no localStorage
+      let tipo: 'fornecedor' | 'consumidor' = 'consumidor';
+
+      if (userRole) {
+        tipo = userRole === 'Fornecedor' ? 'fornecedor' : 'consumidor';
+      } else if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const roleFromToken = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || 'Cliente';
+          tipo = roleFromToken === 'Fornecedor' ? 'fornecedor' : 'consumidor';
+        } catch (error) {
+          console.error('Erro ao decodificar token:', error);
+        }
+      }
+
       setUsuario({
-        email: '', // Não temos o email salvo, mas não é necessário para o header
+        email: userEmail || '',
         nome: userName,
-        tipo: 'consumidor' // Padrão
+        tipo: tipo
       });
     }
   }, []);
@@ -50,6 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Mapear role do backend para tipo do frontend
         const tipoUsuario = roleFromToken === 'Fornecedor' ? 'fornecedor' : 'consumidor';
+
+        // Salvar informações adicionais no localStorage
+        localStorage.setItem('celebrai_user_email', email);
+        localStorage.setItem('celebrai_user_role', roleFromToken);
 
         setUsuario({
           email: email,

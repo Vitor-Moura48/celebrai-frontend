@@ -34,6 +34,18 @@ class AuthService {
       localStorage.setItem('celebrai_token', response.data.tokens.accessToken);
       localStorage.setItem('celebrai_user_name', response.data.name);
 
+      // Tentar extrair telefone do token JWT se disponível
+      try {
+        const token = response.data.tokens.accessToken;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.telefone || payload.celular || payload.phone) {
+          const telefone = payload.telefone || payload.celular || payload.phone;
+          localStorage.setItem('celebrai_user_telefone', telefone);
+        }
+      } catch (error) {
+        console.log('ℹ️ Não foi possível extrair telefone do token');
+      }
+
       // Verificar se foi salvo corretamente
       const tokenSalvo = localStorage.getItem('celebrai_token');
       console.log('💾 Token salvo no localStorage:', tokenSalvo?.substring(0, 50) + '...');
