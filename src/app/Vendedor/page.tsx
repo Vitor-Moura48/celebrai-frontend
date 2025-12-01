@@ -24,30 +24,37 @@ export default function AdicionarProdutoPage() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    nome: '',
-    descricao: '',
-    subCategoria: '1',
-    precoUnitario: '',
-    quantidadeAluguelPorDia: '1',
+    nome: "",
+    descricao: "",
+    subCategoria: "1",
+    precoUnitario: "",
+    quantidadeAluguelPorDia: "1",
   });
 
   const [imagem, setImagem] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Redireciona se não for fornecedor
   useEffect(() => {
     if (!usuario) {
-      router.push('/Login');
-    } else if (usuario.tipo !== 'fornecedor') {
-      router.push('/');
+      router.push("/Login");
+    } else if (usuario.tipo !== "fornecedor") {
+      router.push("/");
     }
   }, [usuario, router]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,47 +77,53 @@ export default function AdicionarProdutoPage() {
     try {
       // Validação básica
       if (!imagem) {
-        setMessage({ type: 'error', text: 'Por favor, selecione uma imagem para o produto.' });
+        setMessage({
+          type: "error",
+          text: "Por favor, selecione uma imagem para o produto.",
+        });
         setIsSubmitting(false);
         return;
       }
 
       // Cria FormData para enviar multipart/form-data
       const data = new FormData();
-      data.append('Nome', formData.nome);
-      data.append('Descricao', formData.descricao);
-      data.append('SubCategoria', formData.subCategoria);
-      data.append('PrecoUnitario', formData.precoUnitario);
-      data.append('QuantidadeAluguelPorDia', formData.quantidadeAluguelPorDia);
-      data.append('Imagem', imagem);
+      data.append("Nome", formData.nome);
+      data.append("Descricao", formData.descricao);
+      data.append("SubCategoria", formData.subCategoria);
+      data.append("PrecoUnitario", formData.precoUnitario);
+      data.append("QuantidadeAluguelPorDia", formData.quantidadeAluguelPorDia);
+      data.append("Imagem", imagem);
 
-      const response = await api.post('/produto', data, {
+      const response = await api.post("/produto", data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      setMessage({ type: 'success', text: 'Produto cadastrado com sucesso!' });
+      setMessage({ type: "success", text: "Produto cadastrado com sucesso!" });
 
       // Limpa o formulário
       setFormData({
-        nome: '',
-        descricao: '',
-        subCategoria: '1',
-        precoUnitario: '',
-        quantidadeAluguelPorDia: '1',
+        nome: "",
+        descricao: "",
+        subCategoria: "1",
+        precoUnitario: "",
+        quantidadeAluguelPorDia: "1",
       });
       setImagem(null);
       setPreviewUrl(null);
 
       // Redireciona para home após 2 segundos
       setTimeout(() => {
-        router.push('/');
+        router.push("/");
       }, 2000);
     } catch (error: any) {
-      console.error('Erro ao cadastrar produto:', error);
-      const errorMessage = error.response?.data?.errors?.[0] || error.response?.data?.message || 'Erro ao cadastrar produto. Tente novamente.';
-      setMessage({ type: 'error', text: errorMessage });
+      console.error("Erro ao cadastrar produto:", error);
+      const errorMessage =
+        error.response?.data?.errors?.[0] ||
+        error.response?.data?.message ||
+        "Erro ao cadastrar produto. Tente novamente.";
+      setMessage({ type: "error", text: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
@@ -129,7 +142,13 @@ export default function AdicionarProdutoPage() {
         </h1>
 
         {message && (
-          <div className={`mb-6 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <div
+            className={`mb-6 p-4 rounded-lg ${
+              message.type === "success"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
             {message.text}
           </div>
         )}
@@ -137,7 +156,10 @@ export default function AdicionarProdutoPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Nome do Produto */}
           <div>
-            <label htmlFor="nome" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="nome"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Nome do Produto *
             </label>
             <input
@@ -154,7 +176,10 @@ export default function AdicionarProdutoPage() {
 
           {/* Descrição */}
           <div>
-            <label htmlFor="descricao" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="descricao"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Descrição *
             </label>
             <textarea
@@ -171,7 +196,10 @@ export default function AdicionarProdutoPage() {
 
           {/* Categoria */}
           <div>
-            <label htmlFor="subCategoria" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label
+              htmlFor="subCategoria"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
               Categoria *
             </label>
             <select
@@ -182,7 +210,7 @@ export default function AdicionarProdutoPage() {
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
             >
-              {SUBCATEGORIAS.map(cat => (
+              {SUBCATEGORIAS.map((cat) => (
                 <option key={cat.value} value={cat.value}>
                   {cat.label}
                 </option>
@@ -193,7 +221,10 @@ export default function AdicionarProdutoPage() {
           {/* Preço e Quantidade */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="precoUnitario" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label
+                htmlFor="precoUnitario"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
                 Preço Unitário (R$) *
               </label>
               <input
@@ -211,7 +242,10 @@ export default function AdicionarProdutoPage() {
             </div>
 
             <div>
-              <label htmlFor="quantidadeAluguelPorDia" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label
+                htmlFor="quantidadeAluguelPorDia"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
                 Quantidade de Aluguel por Dia
               </label>
               <input
@@ -253,7 +287,9 @@ export default function AdicionarProdutoPage() {
               ) : (
                 <div>
                   <Upload className="mx-auto text-gray-400 mb-3" size={48} />
-                  <p className="text-gray-600 mb-2">Clique para selecionar uma imagem</p>
+                  <p className="text-gray-600 mb-2">
+                    Clique para selecionar uma imagem
+                  </p>
                   <input
                     type="file"
                     accept="image/*"
@@ -272,11 +308,11 @@ export default function AdicionarProdutoPage() {
               disabled={isSubmitting}
               className="flex-1 bg-pink-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-pink-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
-              {isSubmitting ? 'Cadastrando...' : 'Cadastrar Produto'}
+              {isSubmitting ? "Cadastrando..." : "Cadastrar Produto"}
             </button>
             <button
               type="button"
-              onClick={() => router.push('/')}
+              onClick={() => router.push("/")}
               className="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Cancelar
@@ -287,4 +323,3 @@ export default function AdicionarProdutoPage() {
     </main>
   );
 }
-
