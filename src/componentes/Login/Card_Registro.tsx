@@ -57,12 +57,17 @@ export default function RegisterCard() {
       const response = await authService.registrar(registroData);
       console.log("✅ Cadastro bem-sucedido:", response);
 
-      setSuccess("Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.");
+      // Mostrar mensagem de sucesso do backend (use cast to any para evitar erro de tipagem)
+      const mensagem =
+        (response as any)?.message ||
+        (response as any)?.data?.message ||
+        "Cadastro realizado com sucesso! Faça login para continuar.";
+      setSuccess(mensagem);
 
-      // Aguardar 2 segundos e redirecionar para login
+      // Aguardar 3 segundos e redirecionar para login
       setTimeout(() => {
         window.location.reload(); // Recarrega para mostrar o Card_Login
-      }, 2000);
+      }, 3000);
 
     } catch (err: any) {
       console.error("❌ Erro no cadastro:", err);

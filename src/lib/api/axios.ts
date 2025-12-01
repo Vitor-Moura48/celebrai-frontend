@@ -20,6 +20,10 @@ api.interceptors.request.use(
       const token = localStorage.getItem('celebrai_token');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log('🔑 Token sendo enviado:', config.headers.Authorization?.substring(0, 50) + '...');
+        console.log('📡 Requisição:', config.method?.toUpperCase(), config.url);
+      } else {
+        console.warn('⚠️ Nenhum token encontrado no localStorage');
       }
     }
 
@@ -42,12 +46,8 @@ api.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           // Token expirado ou inválido
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('celebrai_token');
-            localStorage.removeItem('celebrai_user');
-            // Redirecionar para login
-            window.location.href = '/Login';
-          }
+          console.warn('⚠️ Erro 401: Token expirado ou inválido');
+          // Não redirecionar automaticamente - deixar o componente decidir
           break;
         case 403:
           console.error('Acesso negado');

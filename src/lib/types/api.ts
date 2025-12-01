@@ -21,8 +21,10 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  nome: string;
-  token: string;
+  name: string;
+  tokens: {
+    accessToken: string;
+  };
 }
 
 export interface RegistroRequest {

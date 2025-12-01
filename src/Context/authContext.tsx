@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import authService from '@/lib/api/services/authService';
 
 interface Usuario {
   email: string;
@@ -17,74 +18,54 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Usuários fake para teste
-const USUARIOS_FAKE = [
-  {
-    email: 'fornecedor@celebrai.com',
-    senha: '123456',
-    nome: 'João Silva',
-    tipo: 'fornecedor' as const
-  },
-  {
-    email: 'consumidor@celebrai.com',
-    senha: '123456',
-    nome: 'Maria Santos',
-    tipo: 'consumidor' as const
-  },
-  {
-    email: 'admin@celebrai.com',
-    senha: 'admin123',
-    nome: 'Admin Celebraí',
-    tipo: 'fornecedor' as const
-  }
-];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const usuarioSalvo = localStorage.getItem('celebrai_usuario');
-    if (usuarioSalvo) {
-      try {
-        setUsuario(JSON.parse(usuarioSalvo));
-      } catch (error) {
-        console.error('Erro ao carregar usuário:', error);
-      }
+    // Verificar se há token e nome de usuário salvos
+    const token = localStorage.getItem('celebrai_token');
+    const userName = localStorage.getItem('celebrai_user_name');
+
+    if (token && userName) {
+      // Usuário está autenticado
+      setUsuario({
+        email: '', // Não temos o email salvo, mas não é necessário para o header
+        nome: userName,
+        tipo: 'consumidor' // Padrão
+      });
     }
   }, []);
 
-  useEffect(() => {
-    if (mounted && usuario) {
-      localStorage.setItem('celebrai_usuario', JSON.stringify(usuario));
-    } else if (mounted && !usuario) {
-      localStorage.removeItem('celebrai_usuario');
-    }
-  }, [usuario, mounted]);
-
   const login = async (email: string, senha: string, tipo: 'fornecedor' | 'consumidor'): Promise<boolean> => {
-    // Simular delay de rede
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      const response = await authService.login({ email, senha });
 
-    const usuarioEncontrado = USUARIOS_FAKE.find(
-      u => u.email === email && u.senha === senha && u.tipo === tipo
-    );
+      if (response.tokens?.accessToken) {
+        // Decodificar o token para pegar a role real do backend
+        const token = response.tokens.accessToken;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const roleFromToken = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || 'Cliente';
 
-    if (usuarioEncontrado) {
-      setUsuario({
-        email: usuarioEncontrado.email,
-        nome: usuarioEncontrado.nome,
-        tipo: usuarioEncontrado.tipo
-      });
-      return true;
+        // Mapear role do backend para tipo do frontend
+        const tipoUsuario = roleFromToken === 'Fornecedor' ? 'fornecedor' : 'consumidor';
+
+        setUsuario({
+          email: email,
+          nome: response.name,
+          tipo: tipoUsuario
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erro no login:', error);
+      return false;
     }
-
-    return false;
-  };
-
-  const logout = () => {
+  }; const logout = () => {
     setUsuario(null);
+    authService.logout();
   };
 
   return (

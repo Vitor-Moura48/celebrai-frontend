@@ -16,12 +16,27 @@ class AuthService {
    * Rota: POST /login
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>('/login', credentials);
+    // Backend espera { Email, Password } com letras maiúsculas
+    const requestData = {
+      Email: credentials.email,
+      Password: credentials.senha
+    };
+
+    console.log('🔐 Fazendo login com:', { Email: credentials.email });
+    const response = await api.post<LoginResponse>('/login', requestData);
+
+    console.log('✅ Resposta do login:', response.data);
+    console.log('🔑 Token recebido:', response.data.tokens?.accessToken?.substring(0, 50) + '...');
+    console.log('👤 Nome do usuário:', response.data.name);
 
     // Salvar token no localStorage
     if (typeof window !== 'undefined') {
-      localStorage.setItem('celebrai_token', response.data.token);
-      localStorage.setItem('celebrai_user_name', response.data.nome);
+      localStorage.setItem('celebrai_token', response.data.tokens.accessToken);
+      localStorage.setItem('celebrai_user_name', response.data.name);
+
+      // Verificar se foi salvo corretamente
+      const tokenSalvo = localStorage.getItem('celebrai_token');
+      console.log('💾 Token salvo no localStorage:', tokenSalvo?.substring(0, 50) + '...');
     }
 
     return response.data;
@@ -34,11 +49,9 @@ class AuthService {
   async registrar(dados: RegistroRequest): Promise<LoginResponse> {
     const response = await api.post<LoginResponse>('/usuario', dados);
 
-    // Salvar token no localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('celebrai_token', response.data.token);
-      localStorage.setItem('celebrai_user_name', response.data.nome);
-    }
+    // Backend de registro não retorna token, apenas mensagem
+    // Usuário precisa fazer login após criar a conta
+    console.log('✅ Conta criada:', response.data);
 
     return response.data;
   }
@@ -137,8 +150,8 @@ class AuthService {
     const response = await api.put<LoginResponse>('/usuario/update/email', dados);
 
     // Atualizar token
-    if (typeof window !== 'undefined' && response.data.token) {
-      localStorage.setItem('celebrai_token', response.data.token);
+    if (typeof window !== 'undefined' && response.data.tokens?.accessToken) {
+      localStorage.setItem('celebrai_token', response.data.tokens.accessToken);
     }
 
     return response.data;

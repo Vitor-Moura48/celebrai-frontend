@@ -4,10 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { AlertCircle, Loader2, CheckCircle } from 'lucide-react';
-import authService from "@/lib/api/services/authService";
+import { useAuth } from "@/Context/authContext";
 
 export default function LoginCard() {
   const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,9 +28,9 @@ export default function LoginCard() {
     setLoading(true);
 
     try {
-      const response = await authService.login({ email, senha });
+      const success = await login(email, senha, 'consumidor');
 
-      if (response.token) {
+      if (success) {
         setSucesso(true);
         setTimeout(() => {
           router.push('/');
