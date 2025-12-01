@@ -53,9 +53,7 @@ export default function RegisterCard() {
         cep: formData.cep.replace(/\D/g, ""), // Remove formatação
       };
 
-      console.log("📤 Dados enviando para o backend:", registroData);
       const response = await authService.registrar(registroData);
-      console.log("✅ Cadastro bem-sucedido:", response);
 
       // Salvar telefone temporariamente no localStorage para usar após o login
       localStorage.setItem('celebrai_user_telefone', formData.telefone);
@@ -74,10 +72,6 @@ export default function RegisterCard() {
       }, 3000);
 
     } catch (err: any) {
-      console.error("❌ Erro no cadastro:", err);
-      console.error("❌ Resposta do erro:", err.response?.data);
-      console.error("❌ Status:", err.response?.status);
-      console.error("❌ Headers:", err.response?.headers);
       // Extrair mensagens de erro de forma robusta e amigável
       let mensagemErro = "Erro ao criar conta. Tente novamente.";
       const data = err.response?.data;

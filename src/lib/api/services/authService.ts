@@ -22,12 +22,7 @@ class AuthService {
       Password: credentials.senha
     };
 
-    console.log('🔐 Fazendo login com:', { Email: credentials.email });
     const response = await api.post<LoginResponse>('/login', requestData);
-
-    console.log('✅ Resposta do login:', response.data);
-    console.log('🔑 Token recebido:', response.data.tokens?.accessToken?.substring(0, 50) + '...');
-    console.log('👤 Nome do usuário:', response.data.name);
 
     // Salvar token no localStorage
     if (typeof window !== 'undefined') {
@@ -46,9 +41,6 @@ class AuthService {
         console.log('ℹ️ Não foi possível extrair telefone do token');
       }
 
-      // Verificar se foi salvo corretamente
-      const tokenSalvo = localStorage.getItem('celebrai_token');
-      console.log('💾 Token salvo no localStorage:', tokenSalvo?.substring(0, 50) + '...');
     }
 
     return response.data;
@@ -63,7 +55,6 @@ class AuthService {
 
     // Backend de registro não retorna token, apenas mensagem
     // Usuário precisa fazer login após criar a conta
-    console.log('✅ Conta criada:', response.data);
 
     return response.data;
   }

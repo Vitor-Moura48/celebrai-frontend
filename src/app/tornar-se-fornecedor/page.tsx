@@ -46,9 +46,6 @@ export default function TornarSeFornecedorPage() {
         try {
             // Verificar se o token existe
             const token = localStorage.getItem('celebrai_token');
-            console.log("🔑 Token existe?", !!token);
-            console.log("🔑 Token completo:", token);
-            console.log("👤 Usuário logado:", usuario);
 
             if (!token) {
                 setError("Você precisa estar autenticado. Faça login novamente.");
@@ -62,9 +59,6 @@ export default function TornarSeFornecedorPage() {
                 const parts = token.split('.');
                 if (parts.length === 3) {
                     const payload = JSON.parse(atob(parts[1]));
-                    console.log("📋 Payload do token:", payload);
-                    console.log("⏰ Token expira em:", new Date(payload.exp * 1000));
-                    console.log("⏰ Agora é:", new Date());
 
                     if (payload.exp * 1000 < Date.now()) {
                         setError("Seu token expirou. Faça login novamente.");
@@ -73,10 +67,10 @@ export default function TornarSeFornecedorPage() {
                         return;
                     }
                 } else {
-                    console.error("❌ Token com formato inválido");
+                    // Token com formato inválido
                 }
             } catch (e) {
-                console.error("❌ Erro ao decodificar token:", e);
+                // Erro ao decodificar token
             }
 
             // Backend C# espera propriedades com PascalCase (primeira letra maiúscula)
@@ -96,11 +90,7 @@ export default function TornarSeFornecedorPage() {
                 }),
             };
 
-            console.log("📤 Enviando dados:", requestData);
-
             const response = await api.post('/fornecedor', requestData);
-
-            console.log("✅ Fornecedor registrado:", response.data);
 
             setSuccess(true);
 
@@ -110,11 +100,6 @@ export default function TornarSeFornecedorPage() {
             }, 2000);
 
         } catch (err: any) {
-            console.error("❌ Erro ao registrar fornecedor:", err);
-            console.error("❌ Resposta completa:", err.response);
-            console.error("❌ Status:", err.response?.status);
-            console.error("❌ Dados:", err.response?.data);
-
             let mensagemErro = "Erro ao atualizar conta. Tente novamente.";
 
             // Erro de autenticação - token expirado ou inválido

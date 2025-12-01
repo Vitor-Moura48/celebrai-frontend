@@ -39,7 +39,6 @@ export default function LoginCard() {
         setErro('Email ou senha incorretos');
       }
     } catch (error: any) {
-      console.error("❌ Erro no login:", error);
 
       let mensagemErro = "Erro ao fazer login. Tente novamente.";
       const data = error.response?.data;

@@ -2,7 +2,6 @@ import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'ax
 
 // Configuração base do Axios
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5156';
-console.log('🔧 API URL configurada:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
@@ -20,8 +19,6 @@ api.interceptors.request.use(
       const token = localStorage.getItem('celebrai_token');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('🔑 Token sendo enviado:', config.headers.Authorization?.substring(0, 50) + '...');
-        console.log('📡 Requisição:', config.method?.toUpperCase(), config.url);
       } else {
         console.warn('⚠️ Nenhum token encontrado no localStorage');
       }
