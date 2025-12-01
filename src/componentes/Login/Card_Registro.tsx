@@ -78,18 +78,57 @@ export default function RegisterCard() {
       console.error("❌ Resposta do erro:", err.response?.data);
       console.error("❌ Status:", err.response?.status);
       console.error("❌ Headers:", err.response?.headers);
-
-      // Extrair mensagens de erro
+      // Extrair mensagens de erro de forma robusta e amigável
       let mensagemErro = "Erro ao criar conta. Tente novamente.";
+      const data = err.response?.data;
 
-      if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
-        mensagemErro = err.response.data.errors.join(", ");
-      } else if (err.response?.data?.message) {
-        mensagemErro = err.response.data.message;
-      } else if (err.response?.data) {
-        mensagemErro = JSON.stringify(err.response.data);
-      } else if (err.response?.status) {
-        mensagemErro = `Erro HTTP ${err.response.status}`;
+      try {
+        if (data) {
+          if (typeof data === "string") {
+            // Tenta parsear string JSON
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.Errors && Array.isArray(parsed.Errors)) {
+                mensagemErro = parsed.Errors.join(", ");
+              } else if (parsed.errors && Array.isArray(parsed.errors)) {
+                mensagemErro = parsed.errors.join(", ");
+              } else if (parsed.message) {
+                mensagemErro = parsed.message;
+              } else if (parsed.Message) {
+                mensagemErro = parsed.Message;
+              } else {
+                mensagemErro = JSON.stringify(parsed);
+              }
+            } catch {
+              // Não é JSON — usar string bruta
+              mensagemErro = data;
+            }
+          } else if (typeof data === "object") {
+            if (data.Errors && Array.isArray(data.Errors)) {
+              mensagemErro = data.Errors.join(", ");
+            } else if (data.errors && Array.isArray(data.errors)) {
+              mensagemErro = data.errors.join(", ");
+            } else if (data.message) {
+              mensagemErro = data.message;
+            } else if (data.Message) {
+              mensagemErro = data.Message;
+            } else {
+              // Pegar o primeiro valor textual ou array presente
+              const vals = Object.values(data);
+              const firstArray = vals.find((v) => Array.isArray(v));
+              if (firstArray) mensagemErro = (firstArray as any).join(", ");
+              else {
+                const firstString = vals.find((v) => typeof v === "string");
+                if (firstString) mensagemErro = String(firstString);
+                else mensagemErro = JSON.stringify(data);
+              }
+            }
+          }
+        } else if (err.response?.status) {
+          mensagemErro = `Erro HTTP ${err.response.status}`;
+        }
+      } catch (parseErr) {
+        console.error('Erro ao processar mensagem de erro:', parseErr);
       }
 
       setError(mensagemErro);

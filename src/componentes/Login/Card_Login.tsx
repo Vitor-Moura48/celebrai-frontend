@@ -42,13 +42,50 @@ export default function LoginCard() {
       console.error("❌ Erro no login:", error);
 
       let mensagemErro = "Erro ao fazer login. Tente novamente.";
+      const data = error.response?.data;
 
-      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
-        mensagemErro = error.response.data.errors.join(", ");
-      } else if (error.response?.data?.message) {
-        mensagemErro = error.response.data.message;
-      } else if (error.response?.status === 401) {
-        mensagemErro = "Email ou senha incorretos";
+      try {
+        if (error.response?.status === 401) {
+          mensagemErro = "Email ou senha incorretos";
+        } else if (data) {
+          if (typeof data === "string") {
+            // Tenta parsear string JSON
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.Errors && Array.isArray(parsed.Errors)) {
+                mensagemErro = parsed.Errors.join(", ");
+              } else if (parsed.errors && Array.isArray(parsed.errors)) {
+                mensagemErro = parsed.errors.join(", ");
+              } else if (parsed.message) {
+                mensagemErro = parsed.message;
+              } else if (parsed.Message) {
+                mensagemErro = parsed.Message;
+              }
+            } catch {
+              mensagemErro = data;
+            }
+          } else if (typeof data === "object") {
+            if (data.Errors && Array.isArray(data.Errors)) {
+              mensagemErro = data.Errors.join(", ");
+            } else if (data.errors && Array.isArray(data.errors)) {
+              mensagemErro = data.errors.join(", ");
+            } else if (data.message) {
+              mensagemErro = data.message;
+            } else if (data.Message) {
+              mensagemErro = data.Message;
+            } else {
+              const vals = Object.values(data);
+              const firstArray = vals.find((v) => Array.isArray(v));
+              if (firstArray) mensagemErro = (firstArray as any).join(", ");
+              else {
+                const firstString = vals.find((v) => typeof v === "string");
+                if (firstString) mensagemErro = String(firstString);
+              }
+            }
+          }
+        }
+      } catch (parseErr) {
+        console.error('Erro ao processar mensagem de erro:', parseErr);
       }
 
       setErro(mensagemErro);
