@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import authService from "@/lib/api/services/authService";
+import GoogleLoginButton from "./Google_Login";
 
 export default function RegisterCard() {
   const router = useRouter();
@@ -275,13 +276,9 @@ export default function RegisterCard() {
           <div className="h-px bg-white/30 flex-1"></div>
         </div>
 
-        <button
-          type="button"
-          className="w-full bg-white/20 border border-white/40 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-white/30 transition"
-        >
-          <FcGoogle size={20} />
-          <span className="text-sm font-medium">Continuar com o Google</span>
-        </button>
+        <div className="w-full py-2 flex justify-center">
+          <GoogleLoginButton/>
+        </div>
       </form>
 
       <p className="text-xs text-white/60 mt-4 leading-snug">

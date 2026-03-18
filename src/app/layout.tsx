@@ -5,7 +5,8 @@ import "./globals.css";
 import { Header } from "../componentes/header"
 import { Footer } from "../componentes/footer"
 import { CarrinhoProvider } from "@/Context/carrinhoContext";
-import { AuthProvider } from "@/Context/authContext"; // ← ADICIONAR
+import { AuthProvider } from "@/Context/authContext"; 
+import { GoogleOAuthProvider } from '@react-oauth/google'; // ← ADICIONAR
 
 export default function RootLayout({
   children,
@@ -23,13 +24,15 @@ export default function RootLayout({
       <link rel="icon" href="/Vector.svg" />
       
       <body className={`antialiased`}>
-        <AuthProvider>
-          <CarrinhoProvider>
-            <Header />
-            {children}
-            {!isLoginPage && <Footer />}
-          </CarrinhoProvider>
-        </AuthProvider>
+   28   <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+          <AuthProvider>
+            <CarrinhoProvider>
+              <Header />
+              {children}
+              {!isLoginPage && <Footer />}
+            </CarrinhoProvider>
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

@@ -46,6 +46,19 @@ class AuthService {
     return response.data;
   }
 
+  async loginGoogle(idToken : string): Promise<LoginResponse> {
+    const response = await api.post<LoginResponse>('/login/google', { idToken  });
+
+    // Salvar token no localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('celebrai_token', response.data.tokens.accessToken);
+      localStorage.setItem('celebrai_user_name', response.data.name);
+    }
+
+    return response.data;
+  }
+
+
   /**
    * Registra um novo usuário
    * Rota: POST /usuario
