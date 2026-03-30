@@ -1,4 +1,5 @@
 import api from '../axios';
+import Cookies from 'js-cookie';
 import {
   LoginRequest,
   LoginResponse,
@@ -24,9 +25,9 @@ class AuthService {
 
     const response = await api.post<LoginResponse>('/login', requestData);
 
-    // Salvar token no localStorage
+    // Salvar token no cookie e o resto no localStorage
     if (typeof window !== 'undefined') {
-      localStorage.setItem('celebrai_token', response.data.tokens.accessToken);
+      Cookies.set('celebrai_token', response.data.tokens.accessToken, { expires: 7 });
       localStorage.setItem('celebrai_user_name', response.data.name);
 
       // Tentar extrair telefone do token JWT se disponível
@@ -49,9 +50,9 @@ class AuthService {
   async loginGoogle(idToken : string): Promise<LoginResponse> {
     const response = await api.post<LoginResponse>('/login/google', { idToken  });
 
-    // Salvar token no localStorage
+    // Salvar token no cookie e nome no localStorage
     if (typeof window !== 'undefined') {
-      localStorage.setItem('celebrai_token', response.data.tokens.accessToken);
+      Cookies.set('celebrai_token', response.data.tokens.accessToken, { expires: 7 });
       localStorage.setItem('celebrai_user_name', response.data.name);
     }
 
@@ -86,7 +87,7 @@ class AuthService {
    */
   logout(): void {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('celebrai_token');
+      Cookies.remove('celebrai_token');
       localStorage.removeItem('celebrai_user_name');
       localStorage.removeItem('celebrai_user');
       localStorage.removeItem('celebrai_carrinho');
@@ -117,7 +118,7 @@ class AuthService {
    */
   isAutenticado(): boolean {
     if (typeof window !== 'undefined') {
-      return !!localStorage.getItem('celebrai_token');
+      return !!Cookies.get('celebrai_token');
     }
     return false;
   }
@@ -127,7 +128,7 @@ class AuthService {
    */
   getToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('celebrai_token');
+      return Cookies.get('celebrai_token') || null;
     }
     return null;
   }
@@ -167,7 +168,7 @@ class AuthService {
 
     // Atualizar token
     if (typeof window !== 'undefined' && response.data.tokens?.accessToken) {
-      localStorage.setItem('celebrai_token', response.data.tokens.accessToken);
+      Cookies.set('celebrai_token', response.data.tokens.accessToken, { expires: 7 });
     }
 
     return response.data;

@@ -3,7 +3,6 @@ import ProdutoCard from "@/componentes/Card_Produto/ProdutoCard";
 import BannerCarousel from "@/componentes/Home/Banner";
 import CategoriasSlider from "@/componentes/Home/Categorias";
 import SuccessModal from "@/componentes/Models/SuccesModal";
-import SearchBar from "@/componentes/Home/searchBar";
 
 export const metadata: Metadata = {
   title: "Celebraí - Pagina Principal",
@@ -72,18 +71,15 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-50 pt-15 pb-10">
       <SuccessModal />
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-500 text-white py-12 px-4">
+      {/* Hero Section reduzida após mover SearchBar para o Header */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-500 text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-2">
             Comece a busca da sua
           </h1>
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">
             festa perfeita no <strong>Celebraí</strong>
           </h2>
-
-          {/* Search Bar */}
-          <SearchBar />
         </div>
       </div>
 

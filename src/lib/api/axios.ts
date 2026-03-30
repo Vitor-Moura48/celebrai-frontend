@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import Cookies from 'js-cookie';
 
 // Configuração base do Axios
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5156';
@@ -14,13 +15,13 @@ const api = axios.create({
 // Interceptor de Request - Adiciona token de autenticação
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Buscar token do localStorage (apenas no cliente)
+    // Buscar token via Cookies (apenas no cliente)
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('celebrai_token');
+      const token = Cookies.get('celebrai_token');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       } else {
-        console.warn('⚠️ Nenhum token encontrado no localStorage');
+        console.warn('⚠️ Nenhum token encontrado no cookie');
       }
     }
 
@@ -43,8 +44,14 @@ api.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           // Token expirado ou inválido
-          console.warn('⚠️ Erro 401: Token expirado ou inválido');
-          // Não redirecionar automaticamente - deixar o componente decidir
+          console.warn('⚠️ Erro 401: Token expirado ou inválido. Deslogando...');
+          if (typeof window !== 'undefined') {
+            Cookies.remove('celebrai_token');
+            localStorage.removeItem('celebrai_user_name');
+            localStorage.removeItem('celebrai_user');
+            localStorage.removeItem('celebrai_carrinho');
+            window.location.href = '/Login';
+          }
           break;
         case 403:
           console.error('Acesso negado');

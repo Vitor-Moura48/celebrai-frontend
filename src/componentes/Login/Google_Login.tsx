@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
-import { authService } from "@/lib/api";
+import { useAuth } from "@/Context/authContext";
 
 export default function GoogleLoginButton() {
   const router = useRouter();
+  const { loginGoogle } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -26,12 +27,17 @@ export default function GoogleLoginButton() {
           setLoading(true);
 
           try {
-            await authService.loginGoogle(idToken);
-            setSucesso(true);
-            setTimeout(() => {
-              router.push("/");
-            }, 1000);
-          } catch (err: any) {
+            const success = await loginGoogle(idToken);
+            if (success) {
+              setSucesso(true);
+              setTimeout(() => {
+                router.push("/");
+              }, 1000);
+            } else {
+              setErro("Erro ao autenticar com Google");
+            }
+          } catch (error: unknown) {
+            const err = error as any;
             console.error("Erro detalhado:", err);
             setErro(err.response?.data?.message || "Erro ao autenticar com Google");
           } finally {

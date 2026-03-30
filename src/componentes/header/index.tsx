@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from 'react'
 import { CarrinhoIcone } from '@/componentes/header/componentes/carrinhoIcone'
 import { useAuth } from '@/Context/authContext'
 import { User, LogOut, Package, UserCircle, Store } from 'lucide-react'
+import SearchBar from '@/componentes/Home/searchBar'
 
 export function Header() {
     const { usuario, logout, isAuthenticated } = useAuth();
@@ -37,8 +38,13 @@ export function Header() {
                     <span className="font-bold text-xl">Celebraí</span>
                 </Link>
 
+                {/* Barra de Pesquisa */}
+                <div className="flex-1 px-4 lg:px-8 max-w-2xl">
+                    <SearchBar />
+                </div>
+
                 {/* Navigation */}
-                <nav className="flex items-center space-x-6">
+                <nav className="flex items-center space-x-6 shrink-0">
                     {isAuthenticated ? (
                         <div className="relative" ref={menuRef}>
                             {/* Avatar com dropdown */}
@@ -124,7 +130,7 @@ export function Header() {
                                 Entrar
                             </Link>
                             <Link
-                                href="/Login"
+                                href="/Login?mode=register"
                                 className="bg-[#ff007f] text-white text-sm font-medium px-5 py-2.5 rounded-md hover:opacity-90 transition"
                             >
                                 Cadastre-se

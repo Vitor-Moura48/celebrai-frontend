@@ -1,21 +1,12 @@
-"use client"
-
-import { usePathname } from "next/navigation"
 import "./globals.css";
-import { Header } from "../componentes/header"
-import { Footer } from "../componentes/footer"
-import { CarrinhoProvider } from "@/Context/carrinhoContext";
-import { AuthProvider } from "@/Context/authContext"; 
-import { GoogleOAuthProvider } from '@react-oauth/google'; // ← ADICIONAR
+import { Providers } from "../componentes/Providers";
+import { LayoutWrapper } from "../componentes/LayoutWrapper";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-   const pathname = usePathname();
-   const isLoginPage = pathname === "/Login";
 
   return (
     <html lang="en">
@@ -24,15 +15,11 @@ export default function RootLayout({
       <link rel="icon" href="/Vector.svg" />
       
       <body className={`antialiased`}>
-   28   <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-          <AuthProvider>
-            <CarrinhoProvider>
-              <Header />
-              {children}
-              {!isLoginPage && <Footer />}
-            </CarrinhoProvider>
-          </AuthProvider>
-        </GoogleOAuthProvider>
+        <Providers>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+        </Providers>
       </body>
     </html>
   );

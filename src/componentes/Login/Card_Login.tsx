@@ -40,13 +40,13 @@ export default function LoginCard() {
       } else {
         setErro('Email ou senha incorretos');
       }
-    } catch (error: any) {
-
+    } catch (error: unknown) {
+      const err = error as any;
       let mensagemErro = "Erro ao fazer login. Tente novamente.";
-      const data = error.response?.data;
+      const data = err.response?.data;
 
       try {
-        if (error.response?.status === 401) {
+        if (err.response?.status === 401) {
           mensagemErro = "Email ou senha incorretos";
         } else if (data) {
           if (typeof data === "string") {
