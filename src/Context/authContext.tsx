@@ -16,6 +16,7 @@ interface AuthContextType {
   loginGoogle: (idToken: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -35,7 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (token && userName) {
       // Decodificar o token para pegar a role se não estiver no localStorage
       let tipo: 'fornecedor' | 'consumidor' = 'consumidor';
-      console.error(tipo)
       if (userRole) {
         tipo = userRole === 'Fornecedor' ? 'fornecedor' : 'consumidor';
       } else if (token) {
@@ -54,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         tipo: tipo
       });
     }
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, senha: string, tipo: 'fornecedor' | 'consumidor'): Promise<boolean> => {
@@ -133,7 +135,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         loginGoogle,
         logout,
-        isAuthenticated: !!usuario
+        isAuthenticated: !!usuario,
+        isLoading
       }}
     >
       {children}

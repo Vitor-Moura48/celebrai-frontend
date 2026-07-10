@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { CarrinhoIcone } from '@/componentes/header/componentes/carrinhoIcone'
 import { useAuth } from '@/Context/authContext'
 import { User, LogOut, Package, UserCircle, Store } from 'lucide-react'
@@ -12,6 +13,7 @@ export function Header() {
     const { usuario, logout, isAuthenticated } = useAuth();
     const [showUserMenu, setShowUserMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
 
     // Fechar menu ao clicar fora
     useEffect(() => {
@@ -25,7 +27,10 @@ export function Header() {
     }, []);
 
     return (
-        <header className="fixed top-0 left-0 w-full z-50 bg-[#2a0047]/95 backdrop-blur-sm text-white shadow-md">
+        <header
+            style={{ background: 'linear-gradient(120deg, var(--header-grad-from) 0%, var(--header-grad-mid) 50%, var(--header-grad-to) 100%)' }}
+            className="fixed top-0 left-0 w-full z-50 backdrop-blur-lg text-white shadow-lg"
+        >
             <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
                 {/* Logo */}
                 <Link href="/" className="flex items-center space-x-2">
@@ -40,7 +45,7 @@ export function Header() {
 
                 {/* Barra de Pesquisa */}
                 <div className="flex-1 px-4 lg:px-8 max-w-2xl">
-                    <SearchBar />
+                    {pathname !== '/Login' && <SearchBar />}
                 </div>
 
                 {/* Navigation */}
@@ -76,8 +81,8 @@ export function Header() {
                                                 onClick={() => setShowUserMenu(false)}
                                                 className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 transition"
                                             >
-                                                <Package className="w-4 h-4 text-purple-600" />
-                                                <span className="text-sm font-medium">Adicionar Produtos</span>
+                                                <Store className="w-4 h-4 text-purple-600" />
+                                                <span className="text-sm font-medium">Painel do Fornecedor</span>
                                             </Link>
                                         )}
 

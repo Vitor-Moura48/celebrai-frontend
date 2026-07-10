@@ -72,7 +72,7 @@ export default async function Home() {
     <div className="min-h-screen bg-gray-50 pt-15 pb-10">
       <SuccessModal />
       {/* Hero Section reduzida após mover SearchBar para o Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-500 text-white py-8 px-4">
+      <div style={{ background: 'linear-gradient(120deg, rgba(109,40,217,0.95) 0%, rgba(162,28,175,0.92) 50%, rgba(219,39,119,0.88) 100%)' }} className="text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-2">
             Comece a busca da sua
