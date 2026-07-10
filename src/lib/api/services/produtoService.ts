@@ -55,13 +55,22 @@ class ProdutoService {
   }
 
   /**
-   * Lista produtos do vendedor autenticado
+   * Lista produtos do vendedor autenticado (rota legada)
    */
   async listarMeusProdutos(params?: {
     page?: number;
     limit?: number;
   }): Promise<PaginatedResponse<Produto>> {
     const response = await api.get<PaginatedResponse<Produto>>('/produtos/meus-produtos', { params });
+    return response.data;
+  }
+
+  /**
+   * Lista todos os produtos do fornecedor autenticado
+   * Endpoint: GET /produto
+   */
+  async listarMeusProdutosReal(): Promise<any[]> {
+    const response = await api.get<any[]>('/produto');
     return response.data;
   }
 
@@ -75,17 +84,24 @@ class ProdutoService {
 
   /**
    * Atualiza um produto existente
+   * Endpoint: PUT /Produto/{id}
    */
-  async atualizar(id: string, dados: Partial<ProdutoRequest>): Promise<Produto> {
-    const response = await api.put<Produto>(`/produtos/${id}`, dados);
+  async atualizar(id: string | number, dados: Partial<ProdutoRequest> | FormData): Promise<any> {
+    const isFormData = dados instanceof FormData;
+    const response = await api.put(
+      `/Produto/${id}`,
+      dados,
+      isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
+    );
     return response.data;
   }
 
   /**
    * Deleta um produto
+   * Endpoint: DELETE /Produto/{id}
    */
-  async deletar(id: string): Promise<{ message: string }> {
-    const response = await api.delete(`/produtos/${id}`);
+  async deletar(id: string | number): Promise<any> {
+    const response = await api.delete(`/Produto/${id}`);
     return response.data;
   }
 

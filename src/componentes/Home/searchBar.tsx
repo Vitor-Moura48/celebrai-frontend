@@ -23,12 +23,12 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit} className="flex">
+    <div className="relative w-full max-w-md mx-4 lg:max-w-xl hidden md:flex items-center">
+      <form onSubmit={handleSubmit} className="flex w-full">
         <div className="flex-1 relative">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            size={20}
+            size={18}
           />
           <input
             type="text"
@@ -38,8 +38,8 @@ export default function SearchBar() {
               setQuery(e.target.value);
               if (erro) setErro(false);
             }}
-            placeholder="Buscar 'Conjunto mesas e cadeiras'..."
-            className={`w-full bg-white pl-10 pr-4 py-3 rounded-l-lg text-gray-800 focus:outline-none focus:ring-2 transition ${
+            placeholder="Buscar 'Lembrancinhas'..."
+            className={`w-full bg-white pl-9 pr-4 py-2 text-sm rounded-l-md text-gray-800 focus:outline-none focus:ring-2 transition ${
               erro
                 ? "ring-2 ring-red-500 focus:ring-red-500"
                 : "focus:ring-pink-500"
@@ -48,7 +48,7 @@ export default function SearchBar() {
         </div>
         <button
           type="submit"
-          className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-r-lg font-medium transition-colors"
+          className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 text-sm rounded-r-md font-medium transition-colors"
         >
           Buscar
         </button>
@@ -56,9 +56,9 @@ export default function SearchBar() {
 
       {/* Mensagem de Erro */}
       {erro && (
-        <div className="mt-3 bg-red-50 border-2 border-red-500 rounded-lg p-3 flex items-center gap-2 animate-shake">
-          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-          <p className="text-red-700 font-semibold text-sm">
+        <div className="absolute top-full mt-2 left-0 right-0 z-50 bg-red-50 border-2 border-red-500 rounded-md p-2 flex items-center gap-2 animate-shake shadow-lg">
+          <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+          <p className="text-red-700 font-semibold text-xs">
             Por favor, digite algo para buscar!
           </p>
         </div>

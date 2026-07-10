@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import authService from "@/lib/api/services/authService";
+import GoogleLoginButton from "./Google_Login";
 
 export default function RegisterCard() {
   const router = useRouter();
@@ -13,10 +14,6 @@ export default function RegisterCard() {
   const [formData, setFormData] = useState({
     nome: "",
     sobrenome: "",
-    cpf: "",
-    telefone: "",
-    dataNascimento: "",
-    cep: "",
     email: "",
     senha: "",
     confirmarSenha: "",
@@ -47,17 +44,9 @@ export default function RegisterCard() {
         nome: `${formData.nome} ${formData.sobrenome}`,
         email: formData.email,
         senha: formData.senha,
-        cpfUsuario: formData.cpf.replace(/\D/g, ""), // Remove formatação
-        celular: formData.telefone.replace(/\D/g, ""), // Remove formatação
-        dataNascimento: formData.dataNascimento,
-        cep: formData.cep.replace(/\D/g, ""), // Remove formatação
       };
 
       const response = await authService.registrar(registroData);
-
-      // Salvar telefone temporariamente no localStorage para usar após o login
-      localStorage.setItem('celebrai_user_telefone', formData.telefone);
-      localStorage.setItem('celebrai_user_cep', formData.cep);
 
       // Mostrar mensagem de sucesso do backend (use cast to any para evitar erro de tipagem)
       const mensagem =
@@ -180,51 +169,7 @@ export default function RegisterCard() {
           />
         </div>
 
-        <input
-          type="text"
-          name="cpf"
-          value={formData.cpf}
-          onChange={handleChange}
-          placeholder="CPF"
-          required
-          disabled={loading}
-          maxLength={14}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
-        />
 
-        <input
-          type="tel"
-          name="telefone"
-          value={formData.telefone}
-          onChange={handleChange}
-          placeholder="Número de telefone"
-          required
-          disabled={loading}
-          maxLength={15}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
-        />
-
-        <input
-          type="date"
-          name="dataNascimento"
-          value={formData.dataNascimento}
-          onChange={handleChange}
-          required
-          disabled={loading}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
-        />
-
-        <input
-          type="text"
-          name="cep"
-          value={formData.cep}
-          onChange={handleChange}
-          placeholder="CEP"
-          required
-          disabled={loading}
-          maxLength={9}
-          className="w-full bg-white/20 border border-white/30 rounded-lg px-4 py-2 text-sm placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-[#ff007f] disabled:opacity-50"
-        />
 
         <input
           type="email"
@@ -275,13 +220,9 @@ export default function RegisterCard() {
           <div className="h-px bg-white/30 flex-1"></div>
         </div>
 
-        <button
-          type="button"
-          className="w-full bg-white/20 border border-white/40 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-white/30 transition"
-        >
-          <FcGoogle size={20} />
-          <span className="text-sm font-medium">Continuar com o Google</span>
-        </button>
+        <div className="w-full py-2 flex justify-center">
+          <GoogleLoginButton/>
+        </div>
       </form>
 
       <p className="text-xs text-white/60 mt-4 leading-snug">

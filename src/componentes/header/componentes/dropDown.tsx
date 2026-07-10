@@ -26,7 +26,7 @@ export function CadastroDropdown() {
           <div className="absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-2xl overflow-hidden z-50 border border-gray-100 animate-slideDown">
             {/* Fornecedor */}
             <Link
-                href="/Login?tipo=fornecedor"
+                href="/Login?mode=register&tipo=fornecedor"
                 className="block px-6 py-5 hover:bg-gray-50 transition group cursor-pointer"
                 onClick={() => setDropdownOpen(false)}
             >
@@ -60,7 +60,7 @@ export function CadastroDropdown() {
             
             {/* Consumidor */}
             <Link
-                href="/Login?tipo=consumidor"
+                href="/Login?mode=register&tipo=consumidor"
                 className="block px-6 py-5 hover:bg-gray-50 transition group cursor-pointer"
                 onClick={() => setDropdownOpen(false)}
             >

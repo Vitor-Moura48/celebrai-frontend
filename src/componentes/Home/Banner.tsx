@@ -19,17 +19,17 @@ export default function BannerCarousel() {
 
   return (
     <div className="relative w-full rounded-2xl overflow-hidden shadow-lg mb-8">
-      <div className={`${slides[currentSlide].bgColor} text-white`}>
+      <div style={{ background: 'linear-gradient(90deg, var(--header-grad-from), var(--header-grad-to))' }} className={`text-white`}>
         <div className="flex items-center min-h-[300px] md:min-h-[350px]">
           {/* Lado esquerdo - Texto */}
           <div className="flex-1 p-8 md:p-16 z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-3 leading-tight">
               {slides[currentSlide].title}
             </h2>
-            <p className="text-5xl md:text-6xl font-bold text-[#ff007f] mb-8">
+            <p className="text-5xl md:text-6xl font-bold text-[var(--accent)] mb-8">
               {slides[currentSlide].price}
             </p>
-            <button className="bg-[#ff007f] hover:bg-[#e6006f] text-white px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105 cursor-pointer">
+            <button className="bg-[var(--accent)] hover:opacity-95 text-white px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105 cursor-pointer">
               {slides[currentSlide].buttonText}
             </button>
           </div>

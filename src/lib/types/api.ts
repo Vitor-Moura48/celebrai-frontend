@@ -32,8 +32,8 @@ export interface RegistroRequest {
   email: string;
   senha: string;
   celular?: string;
-  cpfUsuario: string;
-  dataNascimento: string;
+  cpfUsuario?: string;
+  dataNascimento?: string;
   urlIcon?: string;
   lograduro?: string;
   numero?: string;

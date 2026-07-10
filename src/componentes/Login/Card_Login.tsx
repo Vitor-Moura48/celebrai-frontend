@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 import { useAuth } from "@/Context/authContext";
+import { authService } from "@/lib/api";
+import GoogleLoginButton from "./Google_Login";
 
 export default function LoginCard() {
   const router = useRouter();
@@ -38,13 +40,13 @@ export default function LoginCard() {
       } else {
         setErro('Email ou senha incorretos');
       }
-    } catch (error: any) {
-
+    } catch (error: unknown) {
+      const err = error as any;
       let mensagemErro = "Erro ao fazer login. Tente novamente.";
-      const data = error.response?.data;
+      const data = err.response?.data;
 
       try {
-        if (error.response?.status === 401) {
+        if (err.response?.status === 401) {
           mensagemErro = "Email ou senha incorretos";
         } else if (data) {
           if (typeof data === "string") {
@@ -170,15 +172,10 @@ export default function LoginCard() {
           <div className="h-px bg-white/30 flex-1"></div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => alert('Login com Google ainda não implementado')}
-          disabled={loading || sucesso}
-          className="w-full bg-white/20 border border-white/40 rounded-lg py-2 flex items-center justify-center gap-2 hover:bg-white/30 transition disabled:opacity-50"
-        >
-          <FcGoogle size={20} />
-          <span className="text-sm font-medium">Continuar com o Google</span>
-        </button>
+        <div className="w-full py-2 flex justify-center">
+          <GoogleLoginButton/>
+        </div>
+
       </form>
 
       <p className="text-xs text-white/60 mt-4 leading-snug">
